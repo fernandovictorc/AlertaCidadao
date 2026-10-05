@@ -250,6 +250,7 @@ a:hover {
   background-color: var(--color--bg--base);
   border-radius: var(--border--radius--lg);
   transition: background-color 0.2s ease;
+  gap: var(--space--sm);
 }
 
 .product-card:hover {
@@ -282,6 +283,70 @@ a:hover {
   color: var(--color--text--muted);
 }
 
+.report-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.report-title-link:hover {
+  text-decoration: underline;
+}
+
+.report-owner-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space--xs);
+}
+
+.btn-secondary,
+.btn-danger {
+  display: inline-block;
+  border: 1px solid var(--color--border--base);
+  border-radius: var(--border--radius--md);
+  padding: var(--space--xs) var(--space--sm);
+  background: var(--color--bg--base);
+  color: var(--color--text--main);
+  font: inherit;
+  font-weight: var(--font--weight--semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  border-color: var(--color--brand--primary);
+  color: var(--color--brand--primary);
+}
+
+.btn-danger {
+  border-color: var(--color--feedback--error);
+  color: var(--color--feedback--error);
+}
+
+.btn-danger:hover {
+  background: var(--color--feedback--error);
+  color: var(--color--text--inverse);
+}
+
+.btn-secondary:disabled,
+.btn-danger:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.report-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space--md);
+  margin: var(--space--lg) 0;
+}
+
+.report-media-item {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: var(--border--radius--md);
+  object-fit: contain;
+}
+
 .product-card-action {
   width: 56px;
   height: 56px;
@@ -294,6 +359,21 @@ a:hover {
   background-color: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .product-card {
+    flex-wrap: wrap;
+  }
+
+  .product-card-content {
+    min-width: 0;
+  }
+
+  .report-owner-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .product-card-action:hover {
