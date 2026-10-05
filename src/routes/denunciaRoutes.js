@@ -18,9 +18,12 @@ const optionalAuth = (req, res, next) => {
 };
 
 router.get('/', denunciaController.getAllDenuncias);
+router.get('/minhas', verifyToken, denunciaController.getMyDenuncias);
 router.get('/:id', optionalAuth, denunciaController.getDenunciaById);
 router.post('/', verifyToken, denunciaController.createDenuncia);
 router.post('/:id/apoio', verifyToken, denunciaController.toggleApoio);
+router.patch('/:id', verifyToken, denunciaController.updateOwnDenuncia);
+router.delete('/:id', verifyToken, denunciaController.deleteOwnDenuncia);
 
 // Rota de administração
 router.get('/admin/todas', verifyToken, adminAuthMiddleware, denunciaController.getAllDenunciasAdmin);
