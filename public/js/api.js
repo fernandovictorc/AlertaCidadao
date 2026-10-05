@@ -60,8 +60,11 @@ export const getUserProfile = () => fetchAPI('/users/profile');
 export const updateUserProfile = (dados) => fetchAPI('/users/profile', 'PUT', dados);
 
 export const getDenuncias = () => fetchAPI('/denuncias');
+export const getMyDenuncias = () => fetchAPI('/denuncias/minhas');
 export const getDenunciaById = (id) => fetchAPI(`/denuncias/${id}`);
 export const postDenuncia = (dados) => fetchAPI('/denuncias', 'POST', dados);
+export const updateDenuncia = (id, dados) => fetchAPI(`/denuncias/${id}`, 'PATCH', dados);
+export const deleteDenuncia = (id) => fetchAPI(`/denuncias/${id}`, 'DELETE');
 export const toggleApoio = (id) => fetchAPI(`/denuncias/${id}/apoio`, 'POST');
 
 export const getComentarios = (idDenuncia) => fetchAPI(`/denuncias/${idDenuncia}/comentarios`);
