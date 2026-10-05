@@ -54,6 +54,19 @@ exports.getAllDenuncias = async (req, res) => {
     }
 };
 
+exports.getMyDenuncias = async (req, res) => {
+    try {
+        const denuncias = await denunciaModel.getDenunciasByUser(req.user.id);
+        for (const denuncia of denuncias) {
+            denuncia.midias = await midiasModel.getMidiasByDenuncia(denuncia.id);
+        }
+        res.json({ denuncias });
+    } catch (error) {
+        console.error('Erro ao buscar denúncias do usuário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
 exports.getAllDenunciasAdmin = async (req, res) => {
     try {
         const denuncias = await denunciaModel.getAllDenunciasAdmin();
@@ -107,6 +120,61 @@ exports.toggleApoio = async (req, res) => {
         res.json(resultado);
     } catch (error) {
         console.error('Erro ao dar apoio:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.updateOwnDenuncia = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const { titulo, descricao, morada, bairro } = req.body;
+
+        if (!Number.isSafeInteger(id) || id < 1) {
+            return res.status(400).json({ message: 'Identificador de denúncia inválido.' });
+        }
+
+        if (![titulo, descricao, morada, bairro].every(value => typeof value === 'string' && value.trim())) {
+            return res.status(400).json({ message: 'Título, descrição, endereço e bairro são obrigatórios.' });
+        }
+
+        if (titulo.trim().length > 150 || morada.trim().length > 255 || bairro.trim().length > 100) {
+            return res.status(400).json({ message: 'Um ou mais campos excedem o tamanho permitido.' });
+        }
+
+        const denuncia = await denunciaModel.updateOwnDenuncia(id, req.user.id, {
+            titulo: titulo.trim(),
+            descricao: descricao.trim(),
+            morada: morada.trim(),
+            bairro: bairro.trim()
+        });
+
+        if (!denuncia) {
+            return res.status(404).json({ message: 'Denúncia não encontrada ou você não tem permissão para editá-la.' });
+        }
+
+        res.json({ message: 'Denúncia atualizada com sucesso.', denuncia });
+    } catch (error) {
+        console.error('Erro ao editar denúncia:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.deleteOwnDenuncia = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        if (!Number.isSafeInteger(id) || id < 1) {
+            return res.status(400).json({ message: 'Identificador de denúncia inválido.' });
+        }
+
+        const removida = await denunciaModel.deleteOwnDenuncia(id, req.user.id);
+
+        if (!removida) {
+            return res.status(404).json({ message: 'Denúncia não encontrada ou você não tem permissão para excluí-la.' });
+        }
+
+        res.json({ message: 'Denúncia excluída com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir denúncia:', error);
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
