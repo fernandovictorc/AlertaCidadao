@@ -46,6 +46,20 @@ const getAllPublicDenuncias = async () => {
     return result.rows;
 };
 
+const getDenunciasByUser = async (id_utilizador) => {
+    const query = `
+        SELECT d.*,
+               CASE WHEN d.anonimo = true THEN 'Anônimo' ELSE u.nome END as nome_autor,
+               CASE WHEN d.anonimo = true THEN null ELSE u.imagem_perfil END as imagem_autor
+        FROM denuncias d
+        LEFT JOIN utilizadores u ON d.id_utilizador = u.id
+        WHERE d.id_utilizador = $1
+        ORDER BY d.data DESC;
+    `;
+    const result = await db.query(query, [id_utilizador]);
+    return result.rows;
+};
+
 const getAllDenunciasAdmin = async () => {
     const query = `
         SELECT d.*, 
@@ -83,11 +97,36 @@ const updateStatus = async (id, status) => {
     return result.rows[0];
 };
 
+const updateOwnDenuncia = async (id, id_utilizador, denunciaData) => {
+    const { titulo, descricao, morada, bairro } = denunciaData;
+    const query = `
+        UPDATE denuncias
+        SET titulo = $1, descricao = $2, morada = $3, bairro = $4
+        WHERE id = $5 AND id_utilizador = $6
+        RETURNING *;
+    `;
+    const result = await db.query(query, [titulo, descricao, morada, bairro, id, id_utilizador]);
+    return result.rows[0];
+};
+
+const deleteOwnDenuncia = async (id, id_utilizador) => {
+    const query = `
+        DELETE FROM denuncias
+        WHERE id = $1 AND id_utilizador = $2
+        RETURNING id;
+    `;
+    const result = await db.query(query, [id, id_utilizador]);
+    return result.rows[0];
+};
+
 module.exports = {
     createTable,
     createDenuncia,
     getAllPublicDenuncias,
+    getDenunciasByUser,
     getAllDenunciasAdmin,
     getDenunciaById,
-    updateStatus
+    updateStatus,
+    updateOwnDenuncia,
+    deleteOwnDenuncia
 };
