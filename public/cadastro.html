@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Alerta Cidadão</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+</head>
+<body>
+  <!-- Cabeçalho (Header) -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="container">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Crie sua conta</h2>
+        <p>Junte-se à comunidade para relatar e acompanhar problemas.</p>
+      </div>
+
+      <form action="#" method="POST">
+        <div class="form-group">
+          <label for="nome" class="form-label">Nome Completo</label>
+          <input type="text" id="nome" name="nome" class="form-input" placeholder="Seu nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">E-mail</label>
+          <input type="email" id="email" name="email" class="form-input" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="birthdate" class="form-label">Data de Nascimento</label>
+          <input type="date" id="birthdate" name="birthdate" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Senha</label>
+          <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block" style="margin-top: var(--space--md);">Cadastrar</button>
+      </form>
+
+      <div class="form-footer">
+        <p>Já possui conta? <a href="login.html">Faça login</a></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script type="module">
+    import { registerUser } from './js/api.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (isAuthenticated()) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    document.querySelector('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      const data_nascimento = document.getElementById('birthdate').value;
+      const senha = document.getElementById('password').value;
+      const submitBtn = document.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Cadastrando...';
+
+      try {
+        await registerUser({ nome, email, data_nascimento, senha });
+        alert('Cadastro realizado com sucesso! Faça login.');
+        window.location.href = 'login.html';
+      } catch (error) {
+        alert("Erro no cadastro: " + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
+      }
+    });
+  </script>
+</body>
+</html>

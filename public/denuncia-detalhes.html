@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Denúncia - Alerta Cidadão</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+</head>
+<body>
+  <!-- Cabeçalho (Header) -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="container" style="padding-top: var(--space--xxl); padding-bottom: var(--space--xxl);">
+    <article class="feed-container">
+      
+      <div class="d--flex justify--content--space-between align--items--center" style="margin-bottom: var(--space--lg);">
+        <div class="meta-info" style="margin-top: 0;">
+          <span class="tag" style="background-color: var(--color--feedback--warning); color: #fff;">Em Análise</span>
+          <span class="tag">Infraestrutura</span>
+          <span class="tag">Centro</span>
+        </div>
+        <button class="product-card-action active">
+          <svg class="upvote-icon" viewBox="0 0 10 10"><path d="M5 1L10 8H0Z"></path></svg>
+          <span>343</span>
+        </button>
+      </div>
+
+      <h1 style="margin-bottom: var(--space--md);">Buraco enorme na Avenida Central</h1>
+      <p style="font-size: var(--font--size--body--md);">
+        Cratera aberta há mais de duas semanas na via, causando danos aos veículos e risco de acidentes graves. A situação piora em dias de chuva quando fica totalmente coberto de água e os motoristas não conseguem ver a profundidade.
+      </p>
+
+      <div style="margin: var(--space--xl) 0;">
+        <h3 style="margin-bottom: var(--space--md);">Galeria</h3>
+        <div class="d--flex gap--md flex--wrap--wrap">
+          <!-- Espaço reservado para as fotos da denúncia -->
+          <div style="width: 250px; height: 180px; background-color: var(--color--bg--muted); border-radius: var(--border--radius--md); display: flex; align-items: center; justify-content: center; color: var(--color--text--muted);">
+            Foto 1
+          </div>
+          <div style="width: 250px; height: 180px; background-color: var(--color--bg--muted); border-radius: var(--border--radius--md); display: flex; align-items: center; justify-content: center; color: var(--color--text--muted);">
+            Foto 2
+          </div>
+          <!-- Espaço reservado para o player do vídeo -->
+          <div style="width: 250px; height: 180px; background-color: var(--color--bg--muted); border-radius: var(--border--radius--md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--color--text--muted); position: relative;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: var(--space--sm);"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+            Vídeo Curto
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--color--border--base); margin: var(--space--xl) 0;">
+
+      <section>
+        <h3 style="margin-bottom: var(--space--md);">Linha do Tempo Oficial</h3>
+        <ul style="list-style: none; padding: 0; margin: 0; margin-bottom: var(--space--xl);">
+          <li style="margin-bottom: var(--space--md); padding-left: var(--space--lg); border-left: 2px solid var(--color--brand--primary); position: relative;">
+            <div style="position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background-color: var(--color--brand--primary);"></div>
+            <strong>Hoje, 10:00</strong> - Status atualizado para "Em Análise" pela Secretaria de Obras.
+          </li>
+          <li style="margin-bottom: var(--space--md); padding-left: var(--space--lg); border-left: 2px solid var(--color--border--base); position: relative;">
+            <div style="position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background-color: var(--color--border--base);"></div>
+            <strong>Ontem, 14:30</strong> - Denúncia recebida e registrada pelo sistema.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 style="margin-bottom: var(--space--md);">Fórum Comunitário</h3>
+        <div style="background-color: var(--color--bg--hover); padding: var(--space--md); border-radius: var(--border--radius--md); margin-bottom: var(--space--lg);">
+          <p style="margin-bottom: var(--space--sm);"><strong>João Silva:</strong> Já perdi um pneu do meu carro aí ontem à noite! Tem que resolver logo.</p>
+        </div>
+        <div style="background-color: var(--color--bg--hover); padding: var(--space--md); border-radius: var(--border--radius--md); margin-bottom: var(--space--lg);">
+          <p style="margin-bottom: var(--space--sm);"><strong>Maria Souza:</strong> Moro aqui perto e o barulho dos carros freando é constante.</p>
+        </div>
+        
+        <div class="form-group" style="margin-top: var(--space--xl);">
+          <textarea class="form-textarea" placeholder="Adicione um comentário para apoiar a denúncia..." style="min-height: 80px;"></textarea>
+          <button class="btn-primary" style="margin-top: var(--space--sm);">Comentar</button>
+        </div>
+      </section>
+      
+    </article>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script type="module">
+    import { getDenunciaById, getComentarios, postComentario, toggleApoio } from './js/api.js';
+
+    window.toggleApoioGlobal = async function(id) {
+      if (!isAuthenticated()) {
+        alert("Você precisa estar logado para apoiar!");
+        return window.location.href = 'login.html';
+      }
+      try {
+        const res = await toggleApoio(id);
+        const countSpan = document.getElementById(`apoios-count-${id}`);
+        let currentCount = parseInt(countSpan.innerText);
+        if (res.apoiado) {
+          countSpan.innerText = currentCount + 1;
+        } else {
+          countSpan.innerText = currentCount - 1;
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateHeaderAuthUI();
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      
+      if (!id) {
+        document.querySelector('article').innerHTML = '<p>Denúncia não especificada.</p>';
+        return;
+      }
+
+      try {
+        const res = await getDenunciaById(id);
+        const denuncia = res.denuncia;
+        const imageUrl = (denuncia.midias && denuncia.midias.length > 0) ? denuncia.midias[0].url_ou_base64 : 'assets/images/default.jpg';
+
+        document.querySelector('article').innerHTML = `
+          <div class="d--flex justify--content--space-between align--items--center" style="margin-bottom: var(--space--lg);">
+            <div class="meta-info" style="margin-top: 0;">
+              <span class="tag" style="background-color: var(--color--feedback--warning); color: #fff;">${denuncia.estado}</span>
+              <span class="tag">${denuncia.bairro}</span>
+            </div>
+            <button class="product-card-action" onclick="window.toggleApoioGlobal(${denuncia.id})">
+              <svg class="upvote-icon" viewBox="0 0 10 10"><path d="M5 1L10 8H0Z"></path></svg>
+              <span id="apoios-count-${denuncia.id}">${denuncia.apoios_contagem}</span>
+            </button>
+          </div>
+
+          <h1 style="margin-bottom: var(--space--md);">${denuncia.titulo}</h1>
+          <p style="font-size: var(--font--size--body--md);">${denuncia.descricao}</p>
+          <p style="font-size: 14px; color: var(--color--text--muted); margin-top: 10px;">Endereço: ${denuncia.morada}</p>
+
+          <div style="margin: var(--space--xl) 0;">
+            <h3 style="margin-bottom: var(--space--md);">Mídia</h3>
+            <div class="d--flex gap--md flex--wrap--wrap">
+              <img src="${imageUrl}" style="max-width: 100%; border-radius: var(--border--radius--md);" />
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--color--border--base); margin: var(--space--xl) 0;">
+
+          <section>
+            <h3 style="margin-bottom: var(--space--md);">Fórum Comunitário</h3>
+            <div id="comentarios-lista"></div>
+            
+            <div class="form-group" style="margin-top: var(--space--xl);">
+              <textarea id="novo-comentario" class="form-textarea" placeholder="Adicione um comentário para apoiar a denúncia..." style="min-height: 80px;"></textarea>
+              <button id="btn-comentar" class="btn-primary" style="margin-top: var(--space--sm);">Comentar</button>
+            </div>
+          </section>
+        `;
+
+        loadComentarios(id);
+
+        document.getElementById('btn-comentar').addEventListener('click', async () => {
+          if (!isAuthenticated()) {
+             alert('Faça login para comentar');
+             window.location.href = 'login.html';
+             return;
+          }
+          const text = document.getElementById('novo-comentario').value;
+          if (!text) return;
+          const submitBtn = document.getElementById('btn-comentar');
+          const originalText = submitBtn.innerText;
+          submitBtn.disabled = true;
+          submitBtn.innerText = 'Enviando...';
+
+          try {
+            await postComentario(id, { texto: text });
+            document.getElementById('novo-comentario').value = '';
+            loadComentarios(id);
+          } catch (e) {
+            alert(e.message);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+          }
+        });
+
+      } catch (err) {
+        document.querySelector('article').innerHTML = '<p>Erro ao carregar os detalhes.</p>';
+      }
+    });
+
+    async function loadComentarios(id) {
+      const container = document.getElementById('comentarios-lista');
+      try {
+        const res = await getComentarios(id);
+        if (res.comentarios.length === 0) {
+           container.innerHTML = '<p>Nenhum comentário ainda.</p>';
+           return;
+        }
+        
+        container.innerHTML = res.comentarios.map(c => `
+          <div style="background-color: var(--color--bg--hover); padding: var(--space--md); border-radius: var(--border--radius--md); margin-bottom: var(--space--lg);">
+            <p style="margin-bottom: var(--space--sm);"><strong>${c.nome_autor}:</strong> ${c.texto}</p>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<p>Erro ao carregar comentários.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
