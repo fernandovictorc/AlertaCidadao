@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu Perfil - Alerta Cidadão</title>
+  <title>Minhas Denúncias - Alerta Cidadão</title>
   <link rel="stylesheet" href="assets/css/agnostico.css">
   <link rel="stylesheet" href="assets/css/projeto.css">
   <script src="js/auth.js"></script>
   <script>protectRoute();</script>
 </head>
 <body>
-  <!-- Cabeçalho (Header) -->
   <header class="header">
     <div class="container header-content">
       <a href="index.html" class="logo">
@@ -20,50 +19,24 @@
       <nav class="nav-links">
         <a href="index.html" class="nav-link">Início</a>
         <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
-        <a href="perfil.html" class="nav-link" style="color: var(--color--text--main); font-weight: var(--font--weight--semibold);">Meu Perfil</a>
       </nav>
     </div>
   </header>
-
-  <!-- Conteúdo Principal -->
   <main class="container">
-    <div class="form-container form-container-lg">
-      <div class="form-header">
-        <h2>Painel de Perfil</h2>
-        <p>Atualize seus dados cadastrais e preferências.</p>
-      </div>
-
-      <div class="d--flex justify--content--center align--items--center flex--dir--column" style="margin-bottom: var(--space--xl);">
-        <div style="width: 100px; height: 100px; border-radius: var(--border--radius--circle); background-color: var(--color--bg--muted); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: var(--color--text--muted); margin-bottom: var(--space--sm);">
-          JS
-        </div>
-        <button class="btn-primary" style="background-color: transparent; color: var(--color--brand--primary); border: 1px solid var(--color--brand--primary); padding: 4px 12px; font-size: 12px;">Alterar Imagem</button>
-      </div>
-
-      <form action="#" method="POST">
-        <div class="form-group">
-          <label for="nome" class="form-label">Nome de Exibição</label>
-          <input type="text" id="nome" name="nome" class="form-input" value="João Silva" required>
-        </div>
-
-        <div class="form-group">
-          <label for="email" class="form-label">E-mail</label>
-          <input type="email" id="email" name="email" class="form-input" value="joao@email.com" required>
-        </div>
-
-        <div class="form-group">
-          <label for="birthdate" class="form-label">Data de Nascimento</label>
-          <input type="date" id="birthdate" name="birthdate" class="form-input" value="1990-05-15" required>
-        </div>
-
-        <div class="form-group" style="margin-top: var(--space--xl); padding-top: var(--space--md); border-top: 1px solid var(--color--border--base);">
-          <label for="password" class="form-label">Nova Senha (deixe em branco para não alterar)</label>
-          <input type="password" id="password" name="password" class="form-input" placeholder="••••••••">
-        </div>
-
-        <button type="submit" class="btn-primary btn-block" style="margin-top: var(--space--xl);">Salvar Alterações</button>
-      </form>
+    <section class="section-title">
+      <h1>Minhas denúncias</h1>
+      <p id="profile-greeting"></p>
+      <a href="nova-denuncia.html" class="btn-primary">Criar denúncia</a>
+    </section>
+    <div class="feed-container d--flex flex--dir--column gap--md" data-feed="mine" aria-live="polite">
+      <p>Carregando suas denúncias...</p>
     </div>
   </main>
+  <script src="js/ui.js"></script>
+  <script type="module" src="js/feed.js"></script>
+  <script>
+    const user = getUser();
+    document.getElementById('profile-greeting').textContent = user ? `Olá, ${user.nome}. Aqui você pode acompanhar, editar ou excluir suas denúncias.` : '';
+  </script>
 </body>
 </html>
