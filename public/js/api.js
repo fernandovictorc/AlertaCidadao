@@ -1,6 +1,6 @@
 // api.js - Concentra todas as chamadas Fetch API para o backend
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 /**
  * Função utilitária genérica para fazer requisições à API
