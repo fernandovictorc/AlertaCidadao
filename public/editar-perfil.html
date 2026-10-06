@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Perfil - Alerta Cidadão</title>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+  <script src="js/auth.js"></script>
+  <script>protectRoute();</script>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="app.html" class="nav-link">Feed</a>
+        <a href="perfil.html" class="nav-link">Perfil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container form-container" style="max-width: 600px; margin: 40px auto; padding: 20px; background: white; border-radius: var(--radius-md); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h1 style="color: var(--color-primary); margin-bottom: 20px; text-align: center;">Editar Perfil</h1>
+    
+    <form id="edit-profile-form" class="d--flex flex--dir--column gap--md">
+      <div class="form-group">
+        <label for="nome" class="form-label">Nome Completo</label>
+        <input type="text" id="nome" class="form-input" required>
+      </div>
+
+      <div class="form-group">
+        <label for="bio" class="form-label">Biografia</label>
+        <textarea id="bio" class="form-textarea" rows="3" placeholder="Conte um pouco sobre você..."></textarea>
+      </div>
+
+      <div class="form-group d--flex gap--sm" style="align-items: center;">
+        <input type="checkbox" id="is_private" style="width: 20px; height: 20px;">
+        <label for="is_private" class="form-label" style="margin-bottom: 0;">Deixar meu Perfil Privado</label>
+      </div>
+
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Salvar Alterações</button>
+    </form>
+    
+    <div id="status-message" style="margin-top: 15px; text-align: center; color: var(--color-primary); font-weight: bold;"></div>
+  </main>
+
+  <script type="module">
+    import { fetchAPI } from './js/api.js'; 
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const form = document.getElementById('edit-profile-form');
+      const nomeInput = document.getElementById('nome');
+      const bioInput = document.getElementById('bio');
+      const privateCheckbox = document.getElementById('is_private');
+      const statusMsg = document.getElementById('status-message');
+      
+      const token = localStorage.getItem('token');
+
+      // Carregar dados atuais
+      try {
+        const response = await fetch('/api/users/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            nomeInput.value = data.user.nome || '';
+            bioInput.value = data.user.bio || '';
+            privateCheckbox.checked = data.user.is_private || false;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar perfil', error);
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusMsg.textContent = 'Salvando...';
+
+        try {
+          const res = await fetch('/api/users/me', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              nome: nomeInput.value,
+              bio: bioInput.value,
+              is_private: privateCheckbox.checked
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            statusMsg.textContent = 'Perfil atualizado com sucesso!';
+            // Atualizar localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.nome = data.user.nome;
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            setTimeout(() => {
+                window.location.href = 'perfil.html';
+            }, 1500);
+          } else {
+            const err = await res.json();
+            statusMsg.textContent = `Erro: ${err.message}`;
+            statusMsg.style.color = 'red';
+          }
+        } catch (error) {
+          statusMsg.textContent = `Erro: ${error.message}`;
+          statusMsg.style.color = 'red';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
