@@ -3,10 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alerta Cidadão</title>
-  <!-- Importação dos estilos seguindo a arquitetura definida -->
+  <title>Alerta Cidadão - Zeladoria Urbana</title>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/agnostico.css">
   <link rel="stylesheet" href="assets/css/projeto.css">
+  <style>
+    .hero-section {
+      background-image: url('assets/img/hero-banner.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+      padding: 100px 20px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      margin-bottom: 2rem;
+    }
+    .hero-section h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .hero-section p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .feature-card {
+      background-color: var(--color-surface);
+      padding: 2rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .feature-card h3 {
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body>
   <!-- Cabeçalho (Header) -->
@@ -17,28 +55,46 @@
         Alerta Cidadão
       </a>
       <nav class="nav-links">
-        <a href="index.html" class="nav-link">Início</a>
-        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
-        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
+        <a href="login.html" class="nav-link">Entrar</a>
+        <a href="cadastro.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Criar Conta</a>
       </nav>
     </div>
   </header>
 
   <!-- Conteúdo Principal -->
   <main class="container">
-    <div class="tabs d--flex gap--lg">
-      <a href="index.html" class="tab-link active">Trending Topics</a>
-      <a href="em-andamento.html" class="tab-link">Em Andamento</a>
-      <a href="concluidas.html" class="tab-link">Obras Concluídas</a>
-    </div>
+    <section class="hero-section">
+      <h1>O que é o Alerta Cidadão?</h1>
+      <p>Sua plataforma colaborativa para zeladoria urbana. Relate problemas da cidade e acompanhe as soluções da prefeitura.</p>
+      <div class="d--flex flex--center gap--md">
+        <a href="login.html" class="btn-primary" style="font-size: 1.2rem; padding: 15px 30px;">Fazer Login</a>
+        <a href="cadastro.html" class="btn-secondary" style="font-size: 1.2rem; padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; border-radius: var(--radius-sm); text-decoration: none;">Criar Conta</a>
+      </div>
+    </section>
 
-    <div class="feed-container d--flex flex--dir--column gap--md" aria-live="polite">
-      <p>Carregando denúncias...</p>
-    </div>
+    <section class="features-grid">
+      <div class="feature-card">
+        <h3>1. Identifique o Problema</h3>
+        <p>Viu um buraco na rua, poste apagado ou lixo acumulado? Tire uma foto e relate o problema na plataforma.</p>
+      </div>
+      <div class="feature-card">
+        <h3>2. Alerte a Comunidade</h3>
+        <p>Seu alerta fica visível para todos. Outros cidadãos podem comentar e apoiar a sua denúncia.</p>
+      </div>
+      <div class="feature-card">
+        <h3>3. Acompanhe a Solução</h3>
+        <p>Acompanhe o status da sua denúncia. Órgãos públicos podem responder oficialmente e resolver o problema.</p>
+      </div>
+    </section>
   </main>
   
-  <script src="js/auth.js"></script>
-  <script src="js/ui.js"></script>
-  <script type="module" src="js/feed.js"></script>
+  <script>
+    // Se já estiver logado, redirecionar para app.html
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = 'app.html';
+    }
+  </script>
 </body>
 </html>
+
