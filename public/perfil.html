@@ -35,8 +35,76 @@
   <script src="js/ui.js"></script>
   <script type="module" src="js/feed.js"></script>
   <script>
-    const user = getUser();
-    document.getElementById('profile-greeting').textContent = user ? `Olá, ${user.nome}. Aqui você pode acompanhar, editar ou excluir suas denúncias.` : '';
+    document.addEventListener('DOMContentLoaded', async () => {
+        const user = getUser();
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetId = urlParams.get('id');
+        
+        const titleEl = document.querySelector('h1');
+        const greetingEl = document.getElementById('profile-greeting');
+        const feedContainer = document.querySelector('.feed-container');
+        const createBtn = document.querySelector('.btn-primary');
+        
+        // Add Edit Profile button
+        const sectionTitle = document.querySelector('.section-title');
+        
+        if (targetId && (!user || String(user.id) !== targetId)) {
+            // Perfil de Terceiros
+            createBtn.style.display = 'none';
+            feedContainer.removeAttribute('data-feed'); // We'll handle it manually
+            feedContainer.innerHTML = '<p>Carregando perfil...</p>';
+            
+            try {
+                const response = await fetch(`/api/users/${targetId}`, {
+                    headers: user ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {}
+                });
+                
+                if (response.status === 403) {
+                    const data = await response.json();
+                    if (data.erro === 'Perfil Privado') {
+                        titleEl.textContent = 'Perfil Privado';
+                        greetingEl.innerHTML = '<span style="font-size: 2rem;">🔒</span> Este usuário escolheu manter o perfil privado.';
+                        feedContainer.innerHTML = '';
+                        return;
+                    }
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar perfil');
+                }
+                
+                const data = await response.json();
+                titleEl.textContent = `Perfil de ${data.user.nome}`;
+                greetingEl.textContent = data.user.bio ? `Bio: ${data.user.bio}` : '';
+                
+                // Render denuncias using renderFeed from ui.js
+                if (data.denuncias) {
+                    renderFeed(data.denuncias, feedContainer, { 
+                        showSupport: true,
+                        emptyMessage: 'Nenhuma denúncia publicada por este usuário.'
+                    });
+                }
+                
+            } catch (error) {
+                titleEl.textContent = 'Erro';
+                greetingEl.textContent = 'Não foi possível carregar o perfil.';
+                feedContainer.innerHTML = '';
+            }
+        } else {
+            // Meu Perfil
+            titleEl.textContent = 'Minhas denúncias';
+            greetingEl.textContent = user ? `Olá, ${user.nome}. Aqui você pode acompanhar, editar ou excluir suas denúncias.` : '';
+            
+            const editProfileBtn = document.createElement('a');
+            editProfileBtn.href = 'editar-perfil.html';
+            editProfileBtn.className = 'btn-secondary';
+            editProfileBtn.textContent = 'Editar Perfil';
+            editProfileBtn.style.marginLeft = '10px';
+            sectionTitle.appendChild(editProfileBtn);
+            
+            // let feed.js handle it automatically via data-feed="mine"
+        }
+    });
   </script>
 </body>
 </html>
