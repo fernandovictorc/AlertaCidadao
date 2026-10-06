@@ -36,8 +36,21 @@ const getComentariosByDenuncia = async (id_denuncia) => {
     return result.rows;
 };
 
+const getComentarioById = async (id_comentario) => {
+    const query = `SELECT * FROM comentarios WHERE id = $1;`;
+    const result = await db.query(query, [id_comentario]);
+    return result.rows[0];
+};
+
+const deleteComentario = async (id_comentario) => {
+    const query = `DELETE FROM comentarios WHERE id = $1;`;
+    await db.query(query, [id_comentario]);
+};
+
 module.exports = {
     createTable,
     createComentario,
-    getComentariosByDenuncia
+    getComentariosByDenuncia,
+    getComentarioById,
+    deleteComentario
 };
