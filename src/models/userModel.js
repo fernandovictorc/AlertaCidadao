@@ -16,8 +16,11 @@ const createTable = async () => {
     
     try {
         await db.query(`ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS perfil VARCHAR(20) DEFAULT 'cidadao';`);
+        await db.query(`ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'cidadao';`);
+        await db.query(`ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS is_private BOOLEAN DEFAULT FALSE;`);
+        await db.query(`ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS bio TEXT;`);
     } catch(err) {
-        console.error('Erro ao adicionar coluna perfil (pode já existir):', err);
+        console.error('Erro ao adicionar colunas:', err);
     }
 };
 
@@ -40,20 +43,23 @@ const findUserByEmail = async (email) => {
 };
 
 const findUserById = async (id) => {
-    const query = `SELECT id, nome, email, data_nascimento, imagem_perfil, perfil FROM utilizadores WHERE id = $1;`;
+    const query = `SELECT id, nome, email, data_nascimento, imagem_perfil, perfil, role, bio, is_private FROM utilizadores WHERE id = $1;`;
     const result = await db.query(query, [id]);
     return result.rows[0];
 };
 
 const updateUserProfile = async (id, userData) => {
-    const { nome, imagem_perfil } = userData;
+    const { nome, imagem_perfil, bio, is_private } = userData;
     const query = `
         UPDATE utilizadores 
-        SET nome = $1, imagem_perfil = $2
-        WHERE id = $3
-        RETURNING id, nome, email, data_nascimento, imagem_perfil, perfil;
+        SET nome = COALESCE($1, nome), 
+            imagem_perfil = COALESCE($2, imagem_perfil),
+            bio = COALESCE($3, bio),
+            is_private = COALESCE($4, is_private)
+        WHERE id = $5
+        RETURNING id, nome, email, data_nascimento, imagem_perfil, perfil, role, bio, is_private;
     `;
-    const result = await db.query(query, [nome, imagem_perfil, id]);
+    const result = await db.query(query, [nome, imagem_perfil, bio, is_private, id]);
     return result.rows[0];
 };
 
