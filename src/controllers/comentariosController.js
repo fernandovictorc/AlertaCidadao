@@ -33,3 +33,25 @@ exports.getComentarios = async (req, res) => {
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
+
+exports.deleteComentario = async (req, res) => {
+    try {
+        const id_comentario = req.params.id;
+        const id_utilizador_logado = req.user.id;
+        
+        const comentario = await comentariosModel.getComentarioById(id_comentario);
+        if (!comentario) {
+            return res.status(404).json({ message: 'Comentário não encontrado.' });
+        }
+        
+        if (String(comentario.id_utilizador) !== String(id_utilizador_logado) && req.user.role !== 'admin' && req.user.perfil !== 'admin') {
+            return res.status(403).json({ message: 'Acesso negado. Apenas o autor ou admin pode excluir o comentário.' });
+        }
+        
+        await comentariosModel.deleteComentario(id_comentario);
+        res.json({ message: 'Comentário excluído com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir comentário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
