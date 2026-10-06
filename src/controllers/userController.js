@@ -89,9 +89,9 @@ exports.getUserProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { nome, imagem_perfil } = req.body;
+        const { nome, imagem_perfil, bio, is_private } = req.body;
 
-        const updatedUser = await userModel.updateUserProfile(userId, { nome, imagem_perfil });
+        const updatedUser = await userModel.updateUserProfile(userId, { nome, imagem_perfil, bio, is_private });
         if (!updatedUser) {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
@@ -99,6 +99,33 @@ exports.updateProfile = async (req, res) => {
         res.json({ message: 'Perfil atualizado com sucesso.', user: updatedUser });
     } catch (error) {
         console.error('Erro ao atualizar perfil:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.getUserById = async (req, res) => {
+    try {
+        const idParam = req.params.id;
+        const targetUser = await userModel.findUserById(idParam);
+        
+        if (!targetUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+        
+        const isSelf = req.user.id == idParam;
+        const isAdmin = req.user.role === 'admin' || req.user.perfil === 'admin';
+        
+        if (targetUser.is_private && !isSelf && !isAdmin) {
+            return res.status(403).json({ erro: 'Perfil Privado' });
+        }
+        
+        // Fetch denuncias for this user
+        const denunciaModel = require('../models/denunciaModel');
+        const denuncias = await denunciaModel.getDenunciasByUser(idParam);
+        
+        res.json({ user: targetUser, denuncias });
+    } catch (error) {
+        console.error('Erro ao buscar usuário por id:', error);
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
