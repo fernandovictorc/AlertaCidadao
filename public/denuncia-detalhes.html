@@ -29,7 +29,7 @@
   <script src="js/auth.js"></script>
   <script src="js/ui.js"></script>
   <script type="module">
-    import { deleteDenuncia, getComentarios, getDenunciaById, postComentario, toggleApoio } from './js/api.js';
+    import { deleteDenuncia, getComentarios, getDenunciaById, postComentario, toggleApoio, deleteComentario } from './js/api.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       updateHeaderAuthUI();
@@ -121,6 +121,64 @@
         article.appendChild(media);
       }
 
+      if (denuncia.resposta_orgao) {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'official-response';
+        responseDiv.style.background = '#e8f5e9';
+        responseDiv.style.padding = '15px';
+        responseDiv.style.borderLeft = '4px solid var(--color-primary)';
+        responseDiv.style.marginTop = '15px';
+        responseDiv.innerHTML = `<strong>Resposta Oficial (Prefeitura):</strong><p>${denuncia.resposta_orgao}</p>`;
+        article.appendChild(responseDiv);
+      }
+
+      if (user && (user.role === 'admin' || user.perfil === 'admin')) {
+        const adminSection = document.createElement('div');
+        adminSection.className = 'admin-controls';
+        adminSection.style.background = '#f9f9f9';
+        adminSection.style.padding = '15px';
+        adminSection.style.marginTop = '20px';
+        adminSection.style.border = '1px solid #ddd';
+        adminSection.innerHTML = `
+          <h3>Controle do Administrador</h3>
+          <div class="form-group">
+            <label class="form-label">Status da Denúncia</label>
+            <select id="admin-status" class="form-input">
+              <option value="Pendente" ${denuncia.estado === 'Pendente' ? 'selected' : ''}>Pendente</option>
+              <option value="Em Andamento" ${denuncia.estado === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+              <option value="Concluído" ${denuncia.estado === 'Concluído' ? 'selected' : ''}>Concluído</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resposta Oficial</label>
+            <textarea id="admin-resposta" class="form-textarea" rows="3">${denuncia.resposta_orgao || ''}</textarea>
+          </div>
+          <button id="admin-save-btn" class="btn-primary">Salvar Atualizações</button>
+        `;
+        article.appendChild(adminSection);
+
+        adminSection.querySelector('#admin-save-btn').addEventListener('click', async () => {
+          const novoStatus = document.getElementById('admin-status').value;
+          const novaResposta = document.getElementById('admin-resposta').value;
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`/api/denuncias/${denuncia.id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: novoStatus, resposta_orgao: novaResposta })
+            });
+            if (!res.ok) throw new Error('Erro ao atualizar pelo admin');
+            alert('Atualizado com sucesso!');
+            window.location.reload();
+          } catch (e) {
+            alert(e.message);
+          }
+        });
+      }
+
       const supportButton = document.createElement('button');
       supportButton.type = 'button';
       supportButton.className = 'btn-secondary';
@@ -185,11 +243,45 @@
         return;
       }
 
+      const user = getUser();
+
       comentarios.forEach(comentario => {
-        const item = document.createElement('p');
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+        item.style.marginBottom = '1rem';
+        
+        const textWrapper = document.createElement('p');
         const author = document.createElement('strong');
-        author.textContent = `${comentario.nome_autor}: `;
-        item.append(author, document.createTextNode(comentario.texto));
+        const authorLink = document.createElement('a');
+        authorLink.href = `perfil.html?id=${comentario.id_utilizador}`;
+        authorLink.textContent = comentario.nome_autor;
+        authorLink.style.textDecoration = 'none';
+        authorLink.style.color = 'var(--color-primary)';
+        
+        author.appendChild(authorLink);
+        author.appendChild(document.createTextNode(': '));
+        textWrapper.append(author, document.createTextNode(comentario.texto));
+        item.appendChild(textWrapper);
+
+        if (user && (String(user.id) === String(comentario.id_utilizador) || user.role === 'admin' || user.perfil === 'admin')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-danger';
+            deleteBtn.style.padding = '5px 10px';
+            deleteBtn.style.fontSize = '0.8rem';
+            deleteBtn.innerHTML = '🗑 Excluir';
+            deleteBtn.onclick = async () => {
+                if (confirm('Excluir comentário?')) {
+                    try {
+                        await deleteComentario(comentario.id);
+                        await loadComentarios(id);
+                    } catch (err) {
+                        alert(err.message);
+                    }
+                }
+            };
+            item.appendChild(deleteBtn);
+        }
+        
         container.appendChild(item);
       });
     }
