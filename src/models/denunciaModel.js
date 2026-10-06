@@ -18,6 +18,12 @@ const createTable = async () => {
         );
     `;
     await db.query(query);
+    try {
+        await db.query(`ALTER TABLE denuncias ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Pendente';`);
+        await db.query(`ALTER TABLE denuncias ADD COLUMN IF NOT EXISTS resposta_orgao TEXT DEFAULT NULL;`);
+    } catch (err) {
+        console.error('Erro ao adicionar colunas em denuncias:', err);
+    }
 };
 
 const createDenuncia = async (denunciaData) => {
@@ -86,14 +92,14 @@ const getDenunciaById = async (id) => {
     return result.rows[0];
 };
 
-const updateStatus = async (id, status) => {
+const updateStatus = async (id, status, resposta_orgao) => {
     const query = `
         UPDATE denuncias
-        SET estado = $1
-        WHERE id = $2
+        SET estado = $1, status = $1, resposta_orgao = $2
+        WHERE id = $3
         RETURNING *;
     `;
-    const result = await db.query(query, [status, id]);
+    const result = await db.query(query, [status, resposta_orgao, id]);
     return result.rows[0];
 };
 
