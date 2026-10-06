@@ -28,5 +28,6 @@ router.delete('/:id', verifyToken, denunciaController.deleteOwnDenuncia);
 // Rota de administração
 router.get('/admin/todas', verifyToken, adminAuthMiddleware, denunciaController.getAllDenunciasAdmin);
 router.patch('/:id/estado', verifyToken, adminAuthMiddleware, denunciaController.updateStatus);
+router.put('/:id/status', verifyToken, adminAuthMiddleware, denunciaController.updateStatus);
 
 module.exports = router;
