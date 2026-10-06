@@ -112,8 +112,8 @@ exports.getUserById = async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
         
-        const isSelf = req.user.id == idParam;
-        const isAdmin = req.user.role === 'admin' || req.user.perfil === 'admin';
+        const isSelf = req.user ? req.user.id == idParam : false;
+        const isAdmin = req.user ? (req.user.role === 'admin' || req.user.perfil === 'admin') : false;
         
         if (targetUser.is_private && !isSelf && !isAdmin) {
             return res.status(403).json({ erro: 'Perfil Privado' });
