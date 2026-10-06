@@ -10,11 +10,11 @@ function isAuthenticated() {
 }
 
 /**
- * Protege a rota atual. Se não estiver logado, redireciona para login.html
+ * Protege a rota atual. Se não estiver logado, redireciona para index.html
  */
 function protectRoute() {
     if (!isAuthenticated()) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     }
 }
 
