@@ -57,7 +57,12 @@ function renderFeed(denuncias, container, options = {}) {
         if (denuncia.nome_autor) {
             const author = document.createElement('span');
             author.className = 'comment-count';
-            author.textContent = `Por: ${denuncia.nome_autor}`;
+            const authorLink = document.createElement('a');
+            authorLink.href = `perfil.html?id=${denuncia.id_utilizador}`;
+            authorLink.textContent = `Por: ${denuncia.nome_autor}`;
+            authorLink.style.textDecoration = 'none';
+            authorLink.style.color = 'inherit';
+            author.appendChild(authorLink);
             metadata.appendChild(author);
         }
 
