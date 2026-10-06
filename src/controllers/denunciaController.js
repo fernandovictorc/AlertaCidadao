@@ -182,7 +182,8 @@ exports.deleteOwnDenuncia = async (req, res) => {
 exports.updateStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { estado } = req.body;
+        const estado = req.body.estado || req.body.status;
+        const resposta_orgao = req.body.resposta_orgao || null;
 
         if (!estado) {
             return res.status(400).json({ message: 'O novo estado é obrigatório.' });
@@ -193,7 +194,7 @@ exports.updateStatus = async (req, res) => {
             return res.status(404).json({ message: 'Denúncia não encontrada.' });
         }
 
-        const atualizada = await denunciaModel.updateStatus(id, estado);
+        const atualizada = await denunciaModel.updateStatus(id, estado, resposta_orgao);
 
         if (denuncia.notificacao_pref === 'email') {
             const user = await userModel.findUserById(denuncia.id_utilizador);
