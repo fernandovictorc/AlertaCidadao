@@ -272,7 +272,13 @@
             deleteBtn.onclick = async () => {
                 if (confirm('Excluir comentário?')) {
                     try {
-                        await deleteComentario(comentario.id);
+                        const commentId = comentario.id || comentario.id_comentario;
+                        if (!commentId) {
+                            console.error('ID do comentário não encontrado no objeto:', comentario);
+                            alert('Erro: ID do comentário não encontrado.');
+                            return;
+                        }
+                        await deleteComentario(id, commentId);
                         await loadComentarios(id);
                     } catch (err) {
                         alert(err.message);
