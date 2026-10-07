@@ -36,11 +36,18 @@ exports.getComentarios = async (req, res) => {
 
 exports.deleteComentario = async (req, res) => {
     try {
+        console.log("==> [DEBUG DELETE COMENTARIO] Iniciando rota. Params:", req.params);
         const id_comentario = req.params.id;
         const id_utilizador_logado = req.user.id;
         
+        console.log("==> [DEBUG] ID Comentario requisitado:", id_comentario);
+        console.log("==> [DEBUG] ID Utilizador Logado:", id_utilizador_logado);
+
         const comentario = await comentariosModel.getComentarioById(id_comentario);
+        console.log("==> [DEBUG] Comentario encontrado no DB:", comentario);
+
         if (!comentario) {
+            console.log("==> [DEBUG] Retornando 404: Comentario não encontrado no banco.");
             return res.status(404).json({ message: 'Comentário não encontrado.' });
         }
         
