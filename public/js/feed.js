@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!container) {
         return;
     }
+    
+    // Mostra o skeleton loading enquanto busca da API
+    if (typeof renderSkeleton === 'function') {
+        renderSkeleton(container, 4);
+    }
 
     try {
         const isMine = container.dataset.feed === 'mine';
