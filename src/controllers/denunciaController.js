@@ -4,6 +4,8 @@ const apoioModel = require('../models/apoioModel');
 const userModel = require('../models/userModel');
 const emailService = require('../utils/emailService');
 
+const { validateMediaWithAI } = require('../utils/aiValidator');
+
 exports.createDenuncia = async (req, res) => {
     try {
         const id_utilizador = req.user.id;
@@ -35,7 +37,7 @@ exports.createDenuncia = async (req, res) => {
 
         // 2. Filtro de Profanidade Simples
         const badWords = ['puta', 'caralho', 'merda', 'foda', 'foder', 'cuzão', 'cuzao', 'fdp'];
-        const textToCheck = `${titulo} ${descricao}`.toLowerCase();
+        const textToCheck = `${titulo} ${descricao} ${morada} ${bairro}`.toLowerCase();
         if (badWords.some(word => textToCheck.includes(word))) {
             return res.status(400).json({ message: 'A denúncia contém linguagem imprópria e foi bloqueada.' });
         }
@@ -53,10 +55,16 @@ exports.createDenuncia = async (req, res) => {
             if (midia.url_ou_base64.length > 4200000) {
                  return res.status(400).json({ message: 'O tamanho do arquivo excede o limite de 3MB permitido.' });
             }
-            // Verificar mime types aceitos (jpg, jpeg, png, webp, mp4, webm)
+            // Verificar mime types aceitos
             const header = midia.url_ou_base64.substring(0, 50);
             if (!header.match(/^data:(image\/(jpeg|png|webp)|video\/(mp4|webm));base64,/)) {
                  return res.status(400).json({ message: 'Formato de arquivo não suportado. Envie JPG, PNG, WEBP, MP4 ou WEBM.' });
+            }
+
+            // 4. Moderação por IA (Google Gemini)
+            const aiValidation = await validateMediaWithAI(midia.url_ou_base64);
+            if (!aiValidation.isValid) {
+                return res.status(400).json({ message: `Imagem rejeitada pelo filtro de segurança: ${aiValidation.reason}` });
             }
         }
 
@@ -209,7 +217,7 @@ exports.updateOwnDenuncia = async (req, res) => {
         if (/(.)\1{4,}/.test(t) || /(.)\1{4,}/.test(d)) return res.status(400).json({ message: 'Texto inválido (caracteres repetidos).' });
 
         const badWords = ['puta', 'caralho', 'merda', 'foda', 'foder', 'cuzão', 'cuzao', 'fdp'];
-        const textToCheck = `${t} ${d}`.toLowerCase();
+        const textToCheck = `${t} ${d} ${m} ${b}`.toLowerCase();
         if (badWords.some(word => textToCheck.includes(word))) {
             return res.status(400).json({ message: 'A denúncia contém linguagem imprópria e não pode ser editada dessa forma.' });
         }
