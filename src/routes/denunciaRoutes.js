@@ -20,6 +20,11 @@ const optionalAuth = (req, res, next) => {
 router.get('/', denunciaController.getAllDenuncias);
 router.get('/minhas', verifyToken, denunciaController.getMyDenuncias);
 router.get('/:id', optionalAuth, denunciaController.getDenunciaById);
+
+// Montar as rotas de comentários aninhadas sob a denúncia
+const comentariosRoutes = require('./comentariosRoutes');
+router.use('/:id_denuncia/comentarios', comentariosRoutes);
+
 router.post('/', verifyToken, denunciaController.createDenuncia);
 router.post('/:id/apoio', verifyToken, denunciaController.toggleApoio);
 router.patch('/:id', verifyToken, denunciaController.updateOwnDenuncia);
