@@ -26,7 +26,7 @@ const createComentario = async (comentarioData) => {
 
 const getComentariosByDenuncia = async (id_denuncia) => {
     const query = `
-        SELECT c.*, u.nome as nome_autor, u.imagem_perfil as imagem_autor
+        SELECT c.id as id_comentario, c.id_denuncia, c.id_utilizador, c.texto, c.data, u.nome as nome_autor, u.imagem_perfil as imagem_autor
         FROM comentarios c
         JOIN utilizadores u ON c.id_utilizador = u.id
         WHERE c.id_denuncia = $1
