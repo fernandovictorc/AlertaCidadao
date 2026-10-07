@@ -9,161 +9,336 @@
   <link rel="stylesheet" href="assets/css/projeto.css">
   <style>
     :root {
-      --landing-primary: #1976d2;
-      --landing-secondary: #0d47a1;
-      --landing-text: #333;
-      --landing-bg: #f8f9fa;
+      --landing-primary: var(--color-primary, #22c55e);
+      --landing-secondary: #0f172a;
+      --landing-text: var(--color-text-main, #212936);
+      --landing-muted: var(--color-text-muted, #4b587c);
+      --landing-bg: #fdfdfd;
     }
     body {
       background-color: var(--landing-bg);
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
       color: var(--landing-text);
+      -webkit-font-smoothing: antialiased;
     }
     .landing-header {
       background-color: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-bottom: 1px solid var(--color-border, #eaeaea);
       position: sticky;
       top: 0;
       z-index: 100;
+      padding: 15px 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
     .hero {
-      background: linear-gradient(135deg, var(--landing-primary), var(--landing-secondary));
-      color: white;
-      padding: 8rem 2rem;
-      text-align: center;
-      clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+      position: relative;
+      background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.05), transparent 50%),
+                  radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.03), transparent 50%);
+      padding: 100px 20px 80px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--color-border, #eaeaea);
     }
-    .hero h1 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      font-weight: 800;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .hero p {
-      font-size: 1.5rem;
-      max-width: 800px;
-      margin: 0 auto 2.5rem;
-      opacity: 0.95;
-    }
-    .hero-buttons {
+    .hero-content {
       display: flex;
-      gap: 1.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn-landing-primary {
-      background-color: white;
-      color: var(--landing-primary);
-      padding: 1rem 2.5rem;
-      border-radius: 50px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    .btn-landing-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    .btn-landing-secondary {
-      background-color: transparent;
-      color: white;
-      padding: 1rem 2.5rem;
-      border-radius: 50px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-decoration: none;
-      border: 2px solid white;
-      transition: background-color 0.2s, color 0.2s;
-    }
-    .btn-landing-secondary:hover {
-      background-color: white;
-      color: var(--landing-primary);
-    }
-    .features {
-      padding: 5rem 2rem;
+      flex-direction: row;
+      align-items: center;
+      gap: 60px;
       max-width: 1200px;
       margin: 0 auto;
     }
-    .features-title {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 4rem;
+    .hero-text {
+      flex: 1;
+    }
+    .hero-visual {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+    .hero h1 {
+      font-size: 48px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      font-weight: 800;
       color: var(--landing-secondary);
+      letter-spacing: -1px;
+    }
+    .hero h1 span {
+      color: var(--landing-primary);
+    }
+    .hero p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--landing-muted);
+      margin-bottom: 40px;
+      max-width: 500px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .btn-landing-primary {
+      background-color: var(--landing-primary);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);
+    }
+    .btn-landing-primary:hover {
+      background-color: #1ea750;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
+    }
+    .btn-landing-secondary {
+      background-color: white;
+      color: var(--landing-text);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--color-border, #eaeaea);
+      transition: all 0.2s;
+    }
+    .btn-landing-secondary:hover {
+      border-color: #ccc;
+      background-color: #fafafa;
+    }
+    
+    /* Mockup App Interface (Product Hunt Style) */
+    .app-mockup {
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+      overflow: hidden;
+      transform: rotate(-1deg) translateY(-10px);
+      transition: transform 0.3s ease;
+    }
+    .app-mockup:hover {
+      transform: rotate(0) translateY(-15px);
+    }
+    .mockup-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--color-border, #eaeaea);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+    }
+    .mockup-header .dots {
+      display: flex;
+      gap: 6px;
+    }
+    .mockup-header .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e2e8f0;
+    }
+    .mockup-header .dot:nth-child(1) { background: #ff5f56; }
+    .mockup-header .dot:nth-child(2) { background: #ffbd2e; }
+    .mockup-header .dot:nth-child(3) { background: #27c93f; }
+    .mockup-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .mockup-card {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      border: 1px solid var(--color-border, #eaeaea);
+      border-radius: 8px;
+      align-items: center;
+      background: white;
+    }
+    .mockup-card-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .mockup-card-content {
+      flex: 1;
+    }
+    .mockup-card-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: var(--landing-text);
+    }
+    .mockup-card-desc {
+      font-size: 13px;
+      color: var(--landing-muted);
+      margin-bottom: 8px;
+    }
+    .mockup-card-tags {
+      display: flex;
+      gap: 8px;
+    }
+    .mockup-tag {
+      font-size: 11px;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .mockup-card-upvote {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border: 1px solid var(--color-border, #eaeaea);
+      border-radius: 6px;
+      color: var(--landing-text);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .mockup-card-upvote.active {
+      border-color: var(--landing-primary);
+      color: var(--landing-primary);
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    .features {
+      padding: 80px 20px;
+      background: white;
+    }
+    .features-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 50px;
+    }
+    .features-title {
+      font-size: 32px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      color: var(--landing-secondary);
+    }
+    .features-subtitle {
+      font-size: 18px;
+      color: var(--landing-muted);
     }
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 3rem;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
     .feature-card {
       background: white;
-      padding: 3rem 2rem;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      transition: transform 0.3s;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border, #eaeaea);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .feature-card:hover {
-      transform: translateY(-10px);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.03);
     }
-    .feature-icon {
-      font-size: 4rem;
-      margin-bottom: 1.5rem;
-      display: block;
+    .feature-icon-wrapper {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--landing-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
     .feature-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
+      font-size: 18px;
+      margin-bottom: 10px;
       color: var(--landing-secondary);
+      font-weight: 600;
     }
     .feature-card p {
-      font-size: 1.1rem;
-      color: #666;
+      font-size: 15px;
+      color: var(--landing-muted);
       line-height: 1.6;
     }
     .cta-section {
-      background-color: var(--landing-primary);
+      background-color: var(--landing-secondary);
       color: white;
       text-align: center;
-      padding: 5rem 2rem;
+      padding: 80px 20px;
+      margin: 40px 20px;
+      border-radius: 20px;
+    }
+    .cta-content {
+      max-width: 600px;
+      margin: 0 auto;
     }
     .cta-section h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
+      font-size: 36px;
+      margin-bottom: 20px;
+      font-weight: 700;
     }
     .cta-section p {
-      font-size: 1.3rem;
-      margin-bottom: 2rem;
-      opacity: 0.9;
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #94a3b8;
     }
     .footer {
-      background-color: #222;
-      color: #aaa;
+      border-top: 1px solid var(--color-border, #eaeaea);
+      background-color: white;
+      color: var(--landing-muted);
       text-align: center;
-      padding: 2rem;
+      padding: 40px 20px;
+      font-size: 14px;
     }
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 2.5rem; }
-      .hero p { font-size: 1.2rem; }
-      .features-title { font-size: 2rem; }
+    @media (max-width: 900px) {
+      .hero-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      .hero-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .hero h1 { font-size: 36px; }
+      .app-mockup { transform: none; }
     }
   </style>
 </head>
 <body>
   <!-- Header -->
   <header class="header landing-header">
-    <div class="container header-content" style="display: flex; justify-content: space-between; align-items: center;">
-      <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--landing-secondary); font-weight: bold; font-size: 1.5rem;">
-        <div class="logo-icon" style="background: var(--landing-primary); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 1.5rem;">A</div>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--landing-secondary); font-weight: 700; font-size: 1.25rem;">
+        <div class="logo-icon" style="background: var(--landing-primary); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 1.2rem;">A</div>
         Alerta Cidadão
       </a>
-      <nav class="nav-links" style="display: flex; gap: 1rem;">
-        <a href="login.html" class="nav-link" style="color: var(--landing-text); text-decoration: none; font-weight: 500; padding: 0.5rem 1rem;">Entrar</a>
-        <a href="cadastro.html" class="btn-primary" style="background: var(--landing-primary); color: white; padding: 0.5rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: bold;">Criar Conta</a>
+      <nav class="nav-links" style="display: flex; gap: 1.5rem; align-items: center;">
+        <a href="login.html" class="nav-link" style="color: var(--landing-muted); text-decoration: none; font-weight: 500; font-size: 15px;">Entrar</a>
+        <a href="cadastro.html" class="btn-primary" style="background: var(--landing-primary); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 15px; border: none; cursor: pointer;">Criar Conta</a>
       </nav>
     </div>
   </header>
@@ -171,30 +346,81 @@
   <!-- Hero Section -->
   <main>
     <section class="hero">
-      <h1>A sua voz transforma a cidade.</h1>
-      <p>O Alerta Cidadão é a ponte direta entre você e a prefeitura. Relate problemas de zeladoria urbana, acompanhe as soluções e ajude a construir um bairro melhor para todos.</p>
-      <div class="hero-buttons">
-        <a href="cadastro.html" class="btn-landing-primary">Comece a Fiscalizar</a>
-        <a href="login.html" class="btn-landing-secondary">Já tenho uma conta</a>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>A sua voz <span>transforma</span> a cidade.</h1>
+          <p>O Alerta Cidadão é a ponte direta entre você e a prefeitura. Relate problemas de zeladoria urbana, acompanhe as soluções e ajude a construir um bairro melhor para todos.</p>
+          <div class="hero-buttons">
+            <a href="cadastro.html" class="btn-landing-primary">Comece a Fiscalizar</a>
+            <a href="login.html" class="btn-landing-secondary">Já tenho conta</a>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="app-mockup">
+            <div class="mockup-header">
+              <div class="dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+              <div style="font-size: 12px; font-weight: 600; color: #94a3b8;">Feed da Cidade</div>
+              <div style="width: 34px;"></div> <!-- balance spacer -->
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-card">
+                <div class="mockup-card-img">🕳️</div>
+                <div class="mockup-card-content">
+                  <div class="mockup-card-title">Buraco perigoso na via</div>
+                  <div class="mockup-card-desc">Asfalto cedeu após as chuvas recentes...</div>
+                  <div class="mockup-card-tags">
+                    <span class="mockup-tag">Infraestrutura</span>
+                    <span class="mockup-tag">Aberto</span>
+                  </div>
+                </div>
+                <div class="mockup-card-upvote active">
+                  <span style="font-size: 16px; line-height: 1;">▲</span>
+                  <span>42</span>
+                </div>
+              </div>
+              
+              <div class="mockup-card" style="opacity: 0.7;">
+                <div class="mockup-card-img" style="background: linear-gradient(135deg, #fef08a, #fde047);">💡</div>
+                <div class="mockup-card-content">
+                  <div class="mockup-card-title">Poste apagado há dias</div>
+                  <div class="mockup-card-desc">Luz da praça central não está...</div>
+                  <div class="mockup-card-tags">
+                    <span class="mockup-tag">Iluminação</span>
+                  </div>
+                </div>
+                <div class="mockup-card-upvote">
+                  <span style="font-size: 16px; line-height: 1;">▲</span>
+                  <span>15</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Features -->
     <section class="features">
-      <h2 class="features-title">Como o aplicativo funciona?</h2>
+      <div class="features-header">
+        <h2 class="features-title">Como o aplicativo funciona?</h2>
+        <p class="features-subtitle">Uma plataforma construída para dar voz aos cidadãos e agilizar a zeladoria.</p>
+      </div>
       <div class="features-grid">
         <div class="feature-card">
-          <span class="feature-icon">📸</span>
+          <div class="feature-icon-wrapper">📸</div>
           <h3>1. Identifique</h3>
           <p>Encontrou um buraco, entulho ou poste apagado? Tire uma foto e registre a ocorrência em poucos segundos pelo celular.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">🤝</span>
+          <div class="feature-icon-wrapper">🤝</div>
           <h3>2. Mobilize</h3>
           <p>Sua denúncia vai para o Feed público. Seus vizinhos podem apoiar e comentar, aumentando a visibilidade do problema.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">✅</span>
+          <div class="feature-icon-wrapper">✅</div>
           <h3>3. Resolva</h3>
           <p>Acompanhe o status em tempo real. Órgãos públicos são notificados e atualizam a plataforma quando o problema é solucionado.</p>
         </div>
@@ -203,15 +429,25 @@
 
     <!-- Call to Action -->
     <section class="cta-section">
-      <h2>Faça parte da mudança hoje mesmo!</h2>
-      <p>Junte-se a milhares de cidadãos que já estão melhorando suas comunidades.</p>
-      <a href="cadastro.html" class="btn-landing-primary" style="color: var(--landing-secondary);">Criar minha conta gratuita</a>
+      <div class="cta-content">
+        <h2>Faça parte da mudança hoje mesmo!</h2>
+        <p>Junte-se a milhares de cidadãos que já estão melhorando suas comunidades. O cadastro é gratuito e leva menos de 1 minuto.</p>
+        <a href="cadastro.html" class="btn-landing-primary" style="background: white; color: var(--landing-secondary);">Criar minha conta gratuita</a>
+      </div>
     </section>
   </main>
 
   <!-- Footer -->
   <footer class="footer">
-    <p>&copy; 2026 Alerta Cidadão. Todos os direitos reservados.</p>
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--landing-secondary);">
+          <div style="background: var(--landing-primary); color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px;">A</div>
+          Alerta Cidadão
+        </div>
+        <p style="margin: 0;">&copy; 2026 Alerta Cidadão. Zeladoria Urbana na Palma da Mão.</p>
+      </div>
+    </div>
   </footer>
 
   <script>
