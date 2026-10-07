@@ -15,7 +15,6 @@ const denunciaRoutes = require('./src/routes/denunciaRoutes');
 const comentariosRoutes = require('./src/routes/comentariosRoutes');
 
     app.use('/api/users', userRoutes);
-    app.use('/api/denuncias/:id_denuncia/comentarios', comentariosRoutes);
     app.use('/api/denuncias', denunciaRoutes);
     app.use('/api/comentarios', comentariosRoutes);
 
