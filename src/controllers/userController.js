@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const emailService = require('../utils/emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_default';
 
@@ -27,6 +28,14 @@ exports.registerUser = async (req, res) => {
             data_nascimento,
             imagem_perfil: req.body.imagem_perfil || null
         });
+
+        // Tentar enviar e-mail de boas-vindas
+        try {
+            await emailService.sendWelcomeEmail(email, nome);
+        } catch (emailError) {
+            console.error('Erro ao enviar e-mail de boas-vindas:', emailError);
+            // Não bloqueia o registro se o e-mail falhar
+        }
 
         res.status(201).json({ message: 'Usuário registrado com sucesso!', user: newUser });
     } catch (error) {
