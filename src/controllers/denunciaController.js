@@ -13,12 +13,61 @@ exports.createDenuncia = async (req, res) => {
             return res.status(400).json({ message: 'Campos obrigatórios faltando.' });
         }
 
+        // 1. Validação de Tamanho e Repetição
+        if (titulo.length < 10 || titulo.length > 100) {
+            return res.status(400).json({ message: 'O título deve ter entre 10 e 100 caracteres.' });
+        }
+        if (/(.)\1{4,}/.test(titulo) || /(.)\1{4,}/.test(descricao)) {
+            return res.status(400).json({ message: 'Texto inválido: muitos caracteres repetidos consecutivamente.' });
+        }
+
+        if (descricao.length < 30 || descricao.length > 1000) {
+            return res.status(400).json({ message: 'A descrição deve ter entre 30 e 1000 caracteres.' });
+        }
+        const wordCount = descricao.trim().split(/\s+/).length;
+        if (wordCount < 5) {
+            return res.status(400).json({ message: 'A descrição deve conter pelo menos 5 palavras.' });
+        }
+
+        if (bairro.length < 5 || /^\d+$/.test(bairro) || morada.length < 5) {
+            return res.status(400).json({ message: 'O bairro e a morada devem ser válidos (mínimo 5 letras, não apenas números).' });
+        }
+
+        // 2. Filtro de Profanidade Simples
+        const badWords = ['puta', 'caralho', 'merda', 'foda', 'foder', 'cuzão', 'cuzao', 'fdp'];
+        const textToCheck = `${titulo} ${descricao}`.toLowerCase();
+        if (badWords.some(word => textToCheck.includes(word))) {
+            return res.status(400).json({ message: 'A denúncia contém linguagem imprópria e foi bloqueada.' });
+        }
+
+        // 3. Validação de Mídia Obrigatória e Tamanho/Tipo
+        if (!midias || midias.length === 0) {
+            return res.status(400).json({ message: 'É obrigatório enviar pelo menos 1 arquivo de mídia (imagem ou vídeo).' });
+        }
+
+        for (let midia of midias) {
+            if (!midia.url_ou_base64) {
+                 return res.status(400).json({ message: 'Arquivo de mídia inválido.' });
+            }
+            // 3MB limite (em base64 o tamanho aumenta ~33%, então 3MB = ~4.19MB em caracteres)
+            if (midia.url_ou_base64.length > 4200000) {
+                 return res.status(400).json({ message: 'O tamanho do arquivo excede o limite de 3MB permitido.' });
+            }
+            // Verificar mime types aceitos (jpg, jpeg, png, webp, mp4, webm)
+            const header = midia.url_ou_base64.substring(0, 50);
+            if (!header.match(/^data:(image\/(jpeg|png|webp)|video\/(mp4|webm));base64,/)) {
+                 return res.status(400).json({ message: 'Formato de arquivo não suportado. Envie JPG, PNG, WEBP, MP4 ou WEBM.' });
+            }
+        }
+
+        // Sanitização será tratada via frontend ou biblioteca dedicada, aqui barramos lixo principal.
+
         const novaDenuncia = await denunciaModel.createDenuncia({
             id_utilizador,
-            titulo,
-            descricao,
-            morada,
-            bairro,
+            titulo: titulo.trim(),
+            descricao: descricao.trim(),
+            morada: morada.trim(),
+            bairro: bairro.trim(),
             anonimo: anonimo || false,
             privado: privado || false,
             notificacao_pref: notificacao_pref || 'email'
@@ -148,8 +197,21 @@ exports.updateOwnDenuncia = async (req, res) => {
             return res.status(400).json({ message: 'Título, descrição, endereço e bairro são obrigatórios.' });
         }
 
-        if (titulo.trim().length > 150 || morada.trim().length > 255 || bairro.trim().length > 100) {
-            return res.status(400).json({ message: 'Um ou mais campos excedem o tamanho permitido.' });
+        const t = titulo.trim();
+        const d = descricao.trim();
+        const m = morada.trim();
+        const b = bairro.trim();
+
+        if (t.length < 10 || t.length > 100) return res.status(400).json({ message: 'O título deve ter entre 10 e 100 caracteres.' });
+        if (d.length < 30 || d.length > 1000) return res.status(400).json({ message: 'A descrição deve ter entre 30 e 1000 caracteres.' });
+        if (d.split(/\s+/).length < 5) return res.status(400).json({ message: 'A descrição deve conter pelo menos 5 palavras.' });
+        if (b.length < 5 || /^\d+$/.test(b) || m.length < 5) return res.status(400).json({ message: 'Endereço inválido.' });
+        if (/(.)\1{4,}/.test(t) || /(.)\1{4,}/.test(d)) return res.status(400).json({ message: 'Texto inválido (caracteres repetidos).' });
+
+        const badWords = ['puta', 'caralho', 'merda', 'foda', 'foder', 'cuzão', 'cuzao', 'fdp'];
+        const textToCheck = `${t} ${d}`.toLowerCase();
+        if (badWords.some(word => textToCheck.includes(word))) {
+            return res.status(400).json({ message: 'A denúncia contém linguagem imprópria e não pode ser editada dessa forma.' });
         }
 
         const denuncia = await denunciaModel.updateOwnDenuncia(id, req.user.id, {
