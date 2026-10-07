@@ -1,6 +1,29 @@
 // ui.js - Manipulação do DOM e renderização de dados
 
 /**
+ * Função para renderizar skeletons (esqueletos de carregamento)
+ * @param {HTMLElement} container - O elemento pai onde os skeletons serão inseridos
+ * @param {number} count - Número de skeletons a desenhar
+ */
+function renderSkeleton(container, count = 3) {
+    container.replaceChildren();
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-card skeleton';
+        skeleton.innerHTML = `
+            <div class="skeleton-img skeleton"></div>
+            <div style="flex:1;">
+                <div class="skeleton-text-lg skeleton"></div>
+                <div class="skeleton-text-sm skeleton"></div>
+                <div class="skeleton-tags skeleton"></div>
+            </div>
+            <div class="skeleton-btn skeleton"></div>
+        `;
+        container.appendChild(skeleton);
+    }
+}
+
+/**
  * Função para renderizar os cards de denúncias no feed principal
  * @param {Array} denuncias - Lista de denúncias recebidas da API
  * @param {HTMLElement} container - O elemento pai onde os cards serão inseridos
@@ -9,9 +32,24 @@ function renderFeed(denuncias, container, options = {}) {
     container.replaceChildren();
 
     if (denuncias.length === 0) {
-        const emptyMessage = document.createElement('p');
-        emptyMessage.textContent = options.emptyMessage || 'Nenhuma denúncia encontrada.';
-        container.appendChild(emptyMessage);
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        
+        const icon = document.createElement('div');
+        icon.className = 'empty-state-icon';
+        icon.textContent = options.emptyIcon || '📭';
+        
+        const title = document.createElement('h3');
+        title.textContent = options.emptyTitle || 'Nada por aqui ainda';
+        
+        const message = document.createElement('p');
+        message.textContent = options.emptyMessage || 'Nenhuma denúncia encontrada.';
+        
+        emptyState.appendChild(icon);
+        emptyState.appendChild(title);
+        emptyState.appendChild(message);
+        
+        container.appendChild(emptyState);
         return;
     }
 
