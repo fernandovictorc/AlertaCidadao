@@ -31,7 +31,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const isMine = container.dataset.feed === 'mine';
         const response = isMine ? await getMyDenuncias() : await getDenuncias();
-        let denuncias = response.denuncias;
+        let denuncias = response ? response.denuncias : null;
+
+        if (!Array.isArray(denuncias)) {
+            throw new Error("A resposta da API está malformada ou não contém denúncias.");
+        }
 
         if (container.dataset.status === 'progress') {
             denuncias = denuncias.filter(denuncia => {
