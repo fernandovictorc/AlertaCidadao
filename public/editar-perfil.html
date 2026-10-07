@@ -82,7 +82,7 @@
         statusMsg.textContent = 'Salvando...';
 
         try {
-          const res = await fetch('/api/users/me', {
+          const res = await fetch('/api/users/profile', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
