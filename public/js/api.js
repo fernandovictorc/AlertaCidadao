@@ -37,7 +37,12 @@ async function fetchAPI(endpoint, method = 'GET', data = null) {
     }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData = {};
+      try {
+          errorData = await response.json();
+      } catch (err) {
+          console.error('Falha ao fazer parse do erro como JSON', err);
+      }
       throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
     }
 
@@ -69,7 +74,7 @@ export const toggleApoio = (id) => fetchAPI(`/denuncias/${id}/apoio`, 'POST');
 
 export const getComentarios = (idDenuncia) => fetchAPI(`/denuncias/${idDenuncia}/comentarios`);
 export const postComentario = (idDenuncia, dados) => fetchAPI(`/denuncias/${idDenuncia}/comentarios`, 'POST', dados);
-export const deleteComentario = (id) => fetchAPI(`/comentarios/${id}`, 'DELETE');
+export const deleteComentario = (idDenuncia, id) => fetchAPI(`/comentarios/${id}`, 'DELETE');
 
 // Admin
 export const getAllDenunciasAdmin = () => fetchAPI('/denuncias/admin/todas');
