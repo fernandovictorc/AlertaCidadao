@@ -235,17 +235,24 @@
     async function loadComentarios(id) {
       const container = document.getElementById('comentarios-lista');
       if (!container) return;
-      const { comentarios } = await getComentarios(id);
-      container.replaceChildren();
+      
+      try {
+        const { comentarios } = await getComentarios(id);
+        container.replaceChildren();
 
-      if (comentarios.length === 0) {
-        container.textContent = 'Nenhum comentário ainda.';
-        return;
-      }
+        if (!comentarios || !Array.isArray(comentarios)) {
+            container.textContent = 'Erro ao ler comentários da resposta.';
+            return;
+        }
 
-      const user = getUser();
+        if (comentarios.length === 0) {
+          container.textContent = 'Nenhum comentário ainda.';
+          return;
+        }
 
-      comentarios.forEach(comentario => {
+        const user = getUser();
+
+        comentarios.forEach(comentario => {
         const item = document.createElement('div');
         item.className = 'comentario-item';
         item.style.marginBottom = '1rem';
@@ -290,6 +297,9 @@
         
         container.appendChild(item);
       });
+      } catch (error) {
+        container.textContent = 'Erro ao carregar comentários: ' + error.message;
+      }
     }
   </script>
 </body>
