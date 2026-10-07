@@ -2,7 +2,7 @@ const denunciaModel = require('../models/denunciaModel');
 const midiasModel = require('../models/midiasModel');
 const apoioModel = require('../models/apoioModel');
 const userModel = require('../models/userModel');
-const nodemailer = require('nodemailer');
+const emailService = require('../utils/emailService');
 
 exports.createDenuncia = async (req, res) => {
     try {
@@ -27,6 +27,17 @@ exports.createDenuncia = async (req, res) => {
         if (midias && midias.length > 0) {
             for (let midia of midias) {
                 await midiasModel.addMidia(novaDenuncia.id, midia.tipo, midia.url_ou_base64);
+            }
+        }
+
+        if (novaDenuncia.notificacao_pref === 'email') {
+            try {
+                const user = await userModel.findUserById(id_utilizador);
+                if (user && user.email) {
+                    await emailService.sendDenunciaCreatedEmail(user.email, user.nome, novaDenuncia.titulo);
+                }
+            } catch (emailErr) {
+                console.error('Erro ao enviar email de criação de denúncia:', emailErr);
             }
         }
 
@@ -197,27 +208,13 @@ exports.updateStatus = async (req, res) => {
         const atualizada = await denunciaModel.updateStatus(id, estado, resposta_orgao);
 
         if (denuncia.notificacao_pref === 'email') {
-            const user = await userModel.findUserById(denuncia.id_utilizador);
-            if (user && user.email) {
-                const transporter = nodemailer.createTransport({
-                    host: process.env.SMTP_HOST || 'smtp.example.com',
-                    port: process.env.SMTP_PORT || 587,
-                    auth: {
-                        user: process.env.SMTP_USER || 'user',
-                        pass: process.env.SMTP_PASS || 'pass'
-                    }
-                });
-
-                const mailOptions = {
-                    from: `"Alerta Cidadão" <${process.env.SMTP_USER || 'no-reply@alertacidadao.pt'}>`,
-                    to: user.email,
-                    subject: `Atualização de Estado - Denúncia: ${denuncia.titulo}`,
-                    text: `Olá ${user.nome},\n\nO estado da sua denúncia "${denuncia.titulo}" foi atualizado para: ${estado}.\n\nObrigado por usar o Alerta Cidadão!`
-                };
-
-                transporter.sendMail(mailOptions).catch(err => {
-                    console.error('Erro ao enviar email de notificação:', err);
-                });
+            try {
+                const user = await userModel.findUserById(denuncia.id_utilizador);
+                if (user && user.email) {
+                    await emailService.sendDenunciaStatusEmail(user.email, user.nome, denuncia.titulo, estado, resposta_orgao);
+                }
+            } catch (emailErr) {
+                console.error('Erro ao enviar email de notificação de status:', emailErr);
             }
         }
 
