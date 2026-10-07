@@ -246,15 +246,20 @@ a:hover {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: var(--space--md--alt) var(--space--lg);
+  padding: 16px 20px;
   background-color: var(--color--bg--base);
   border-radius: var(--border--radius--lg);
-  transition: background-color 0.2s ease;
-  gap: var(--space--sm);
+  border: 1px solid var(--color--border--base);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  gap: var(--space--lg);
+  margin-bottom: var(--space--md);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .product-card:hover {
   background-color: var(--color--bg--hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.05);
 }
 
 .product-card-thumbnail {
@@ -262,25 +267,33 @@ a:hover {
   height: 72px;
   border-radius: var(--border--radius--md);
   object-fit: cover;
-  margin-right: var(--space--lg);
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .product-card-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .product-card-content h3 {
   margin: 0;
-  margin-bottom: var(--space--xs);
+  margin-bottom: 4px;
   font-size: var(--font--size--heading--sm);
+  font-weight: 600;
+  color: var(--color--text--main);
 }
 
 .product-card-content p {
   margin: 0;
   font-size: var(--font--size--body--sm);
   color: var(--color--text--muted);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .report-title-link {
@@ -359,15 +372,39 @@ a:hover {
   background-color: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.product-card-action:hover {
+  border-color: var(--color--brand--primary);
+  background-color: rgba(34, 197, 94, 0.05);
+}
+
+.product-card-action span {
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.product-card-action:hover span,
+.product-card-action:hover .upvote-icon {
+  color: var(--color--brand--primary);
 }
 
 @media (max-width: 640px) {
   .product-card {
+    padding: 15px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
-  .product-card-content {
-    min-width: 0;
+  .product-card-thumbnail {
+    width: 48px;
+    height: 48px;
+  }
+
+  .product-card-action {
+    width: 48px;
+    height: 48px;
   }
 
   .report-owner-actions {
@@ -631,31 +668,94 @@ a:hover {
   margin-top: 3px;
 }
 
-/* --- Tabs (Abas) --- */
+/* --- Tabs (Abas) Modernas --- */
 .tabs {
   margin-top: var(--space--xl);
   margin-bottom: var(--space--lg);
+  display: flex;
+  gap: var(--space--md);
   border-bottom: 1px solid var(--color--border--base);
 }
 
 .tab-link {
   color: var(--color--text--muted);
-  font-weight: var(--font--weight--semibold);
+  font-weight: 600;
   text-decoration: none;
-  padding-bottom: var(--space--sm);
+  padding: 10px 4px;
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
+  font-size: 15px;
+  margin-bottom: -1px; /* Overlap border */
 }
 
 .tab-link:hover {
   color: var(--color--text--main);
-  text-decoration: none;
 }
 
 .tab-link.active {
   color: var(--color--brand--primary);
   border-bottom-color: var(--color--brand--primary);
 }
+
+/* --- Empty State --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  border: 1px dashed var(--color--border--base);
+  margin-top: 20px;
+}
+
+.empty-state-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  color: var(--color--text--main);
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  color: var(--color--text--muted);
+  margin: 0;
+  font-size: 15px;
+}
+
+/* --- Skeleton Loading --- */
+.skeleton {
+  animation: pulse 1.5s infinite ease-in-out;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.skeleton-card {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--color--border--base);
+  margin-bottom: 16px;
+}
+.skeleton-img { width: 72px; height: 72px; border-radius: 4px; }
+.skeleton-text-lg { height: 20px; width: 60%; margin-bottom: 10px; }
+.skeleton-text-sm { height: 16px; width: 40%; margin-bottom: 10px; }
+.skeleton-tags { height: 20px; width: 30%; }
+.skeleton-btn { width: 56px; height: 56px; border-radius: 6px; margin-left: auto; }
 
 /* Layout com Barra Lateral Removido */
 .app-layout { display: block; }
