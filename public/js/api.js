@@ -74,7 +74,7 @@ export const toggleApoio = (id) => fetchAPI(`/denuncias/${id}/apoio`, 'POST');
 
 export const getComentarios = (idDenuncia) => fetchAPI(`/denuncias/${idDenuncia}/comentarios`);
 export const postComentario = (idDenuncia, dados) => fetchAPI(`/denuncias/${idDenuncia}/comentarios`, 'POST', dados);
-export const deleteComentario = (idDenuncia, id) => fetchAPI(`/comentarios/${id}`, 'DELETE');
+export const deleteComentario = (idDenuncia, id) => fetchAPI(`/denuncias/${idDenuncia}/comentarios/${id}`, 'DELETE');
 
 // Admin
 export const getAllDenunciasAdmin = () => fetchAPI('/denuncias/admin/todas');
