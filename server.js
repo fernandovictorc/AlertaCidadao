@@ -14,9 +14,10 @@ const userRoutes = require('./src/routes/userRoutes');
 const denunciaRoutes = require('./src/routes/denunciaRoutes');
 const comentariosRoutes = require('./src/routes/comentariosRoutes');
 
-app.use('/api/users', userRoutes);
-app.use('/api/denuncias', denunciaRoutes);
-app.use('/api/denuncias/:id_denuncia/comentarios', comentariosRoutes);
+    app.use('/api/users', userRoutes);
+    app.use('/api/denuncias/:id_denuncia/comentarios', comentariosRoutes);
+    app.use('/api/denuncias', denunciaRoutes);
+    app.use('/api/comentarios', comentariosRoutes);
 
 // Servir arquivos estáticos do frontend (Atenção: Os ficheiros estáticos devem ser movidos para a pasta public/)
 app.use(express.static('public'));
