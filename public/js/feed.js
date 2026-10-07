@@ -1,91 +1,78 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrar - Alerta Cidadão</title>
-  <link rel="stylesheet" href="assets/css/agnostico.css">
-  <link rel="stylesheet" href="assets/css/projeto.css">
-</head>
-<body>
-  <!-- Cabeçalho (Header) -->
-  <header class="header">
-    <div class="container header-content">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">A</div>
-        Alerta Cidadão
-      </a>
-      <nav class="nav-links">
-        <a href="index.html" class="nav-link">Início</a>
-        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
-        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
-      </nav>
-    </div>
-  </header>
+import { deleteDenuncia, getDenuncias, getMyDenuncias, toggleApoio } from './api.js';
 
-  <!-- Conteúdo Principal -->
-  <main class="container">
-    <div class="form-container">
-      <div class="form-header">
-        <h2>Acesse sua conta</h2>
-        <p>Faça login para apoiar e publicar denúncias.</p>
-      </div>
+window.deleteDenunciaGlobal = deleteDenuncia;
+window.toggleApoioGlobal = async (id) => {
+    if (!isAuthenticated()) {
+        alert('Você precisa estar logado para apoiar.');
+        window.location.href = 'login.html';
+        return;
+    }
 
-      <form id="login-form" onsubmit="event.preventDefault();">
-        <div class="form-group">
-          <label for="email" class="form-label">E-mail</label>
-          <input type="email" id="email" name="email" class="form-input" placeholder="seu@email.com" required>
-        </div>
+    try {
+        const result = await toggleApoio(id);
+        const count = document.getElementById(`apoios-count-${id}`);
+        if (count) {
+            const currentCount = Number.parseInt(count.textContent, 10) || 0;
+            count.textContent = currentCount + (result.apoiado ? 1 : -1);
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+};
 
-        <div class="form-group">
-          <label for="password" class="form-label">Senha</label>
-          <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
-        </div>
+document.addEventListener('DOMContentLoaded', async () => {
+    updateHeaderAuthUI();
 
-        <button type="submit" class="btn-primary btn-block" style="margin-top: var(--space--md);">Entrar</button>
-      </form>
+    const container = document.querySelector('.feed-container');
+    if (!container) {
+        return;
+    }
 
-      <div class="form-footer">
-        <p>Ainda não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
-      </div>
-    </div>
-  </main>
-  
-  <script src="js/auth.js"></script>
-  <script type="module">
-    import { loginUser } from './js/api.js';
+    try {
+        const isMine = container.dataset.feed === 'mine';
+        const response = isMine ? await getMyDenuncias() : await getDenuncias();
+        let denuncias = response ? response.denuncias : null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof isAuthenticated === 'function' && isAuthenticated()) {
-        window.location.href = 'app.html';
-      }
+        if (!Array.isArray(denuncias)) {
+            throw new Error("A resposta da API está malformada ou não contém denúncias.");
+        }
 
-      const form = document.getElementById('login-form');
-      if (form) {
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const email = document.getElementById('email').value;
-          const senha = document.getElementById('password').value;
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerText;
-          
-          submitBtn.disabled = true;
-          submitBtn.innerText = 'Entrando...';
+        if (container.dataset.status === 'progress') {
+            denuncias = denuncias.filter(denuncia => {
+                const status = normalizeStatus(denuncia.estado);
+                return status !== 'nao respondido' && !status.startsWith('conclu');
+            });
+        } else if (container.dataset.status === 'completed') {
+            denuncias = denuncias.filter(denuncia => normalizeStatus(denuncia.estado).startsWith('conclu'));
+        }
 
-          try {
-            const data = await loginUser({ email, senha });
-            localStorage.setItem('token', data.token);
-            // Salvar garantindo que seja string válida
-            localStorage.setItem('user', data.user ? JSON.stringify(data.user) : null);
-            window.location.href = 'app.html';
-          } catch (error) {
-            alert("Erro no login: " + error.message);
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-          }
+        renderFeed(denuncias, container, {
+            showSupport: !isMine,
+            emptyMessage: isMine ? 'Você ainda não publicou denúncias.' : 'Nenhuma denúncia encontrada nesta categoria.'
         });
-      }
-    });
-  </script>
-</body>
-</html>
+    } catch (error) {
+        container.replaceChildren();
+        const message = document.createElement('p');
+        message.textContent = `Não foi possível carregar as denúncias: ${error.message}`;
+        container.appendChild(message);
+
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'btn-danger';
+        clearBtn.textContent = 'Sair e Voltar ao Início';
+        clearBtn.style.marginTop = '15px';
+        clearBtn.onclick = () => {
+            if (typeof logout === 'function') {
+                logout();
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        };
+        container.appendChild(clearBtn);
+    }
+});
+
+function normalizeStatus(status = '') {
+    return status.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('pt-BR');
+}
