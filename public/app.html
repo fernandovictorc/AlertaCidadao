@@ -25,16 +25,24 @@
   </header>
 
   <!-- Conteúdo Principal -->
-  <main class="container">
-    <div class="tabs d--flex gap--lg">
-      <a href="index.html" class="tab-link active">Trending Topics</a>
-      <a href="em-andamento.html" class="tab-link">Em Andamento</a>
-      <a href="concluidas.html" class="tab-link">Obras Concluídas</a>
-    </div>
+  <main class="container app-layout">
+    <div class="main-content">
+      <div class="tabs d--flex gap--lg">
+        <a href="app.html" class="tab-link active">Feed</a>
+        <a href="em-andamento.html" class="tab-link">Em Andamento</a>
+        <a href="concluidas.html" class="tab-link">Obras Concluídas</a>
+      </div>
 
-    <div class="feed-container d--flex flex--dir--column gap--md" aria-live="polite">
-      <p>Carregando denúncias...</p>
+      <div class="feed-container d--flex flex--dir--column gap--md" aria-live="polite">
+        <p>Carregando denúncias...</p>
+      </div>
     </div>
+    
+    <aside class="sidebar-ads">
+      <h3 style="margin-top: 0; font-size: 1.1rem; color: #555;">Publicidade</h3>
+      <div class="ad-banner">Espaço Patrocinado</div>
+      <div class="ad-banner">Espaço Patrocinado</div>
+    </aside>
   </main>
   
   <script src="js/auth.js"></script>
