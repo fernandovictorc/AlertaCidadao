@@ -3,98 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alerta Cidadão - Zeladoria Urbana</title>
+  <title>Alerta Cidadão - Zeladoria Urbana na Palma da Mão</title>
   <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/agnostico.css">
   <link rel="stylesheet" href="assets/css/projeto.css">
   <style>
-    .hero-section {
-      background-image: url('assets/img/hero-banner.jpg');
-      background-size: cover;
-      background-position: center;
+    :root {
+      --landing-primary: #1976d2;
+      --landing-secondary: #0d47a1;
+      --landing-text: #333;
+      --landing-bg: #f8f9fa;
+    }
+    body {
+      background-color: var(--landing-bg);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--landing-text);
+    }
+    .landing-header {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--landing-primary), var(--landing-secondary));
       color: white;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
-      padding: 100px 20px;
+      padding: 8rem 2rem;
       text-align: center;
-      border-radius: var(--radius-md);
-      margin-bottom: 2rem;
+      clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
     }
-    .hero-section h1 {
-      font-size: 3rem;
+    .hero h1 {
+      font-size: 3.5rem;
       margin-bottom: 1rem;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .hero-section p {
+    .hero p {
+      font-size: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto 2.5rem;
+      opacity: 0.95;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-landing-primary {
+      background-color: white;
+      color: var(--landing-primary);
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
       font-size: 1.2rem;
-      margin-bottom: 2rem;
+      font-weight: bold;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .btn-landing-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .btn-landing-secondary {
+      background-color: transparent;
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-decoration: none;
+      border: 2px solid white;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .btn-landing-secondary:hover {
+      background-color: white;
+      color: var(--landing-primary);
+    }
+    .features {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .features-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 4rem;
+      color: var(--landing-secondary);
     }
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
+      gap: 3rem;
     }
     .feature-card {
-      background-color: var(--color-surface);
-      padding: 2rem;
-      border-radius: var(--radius-md);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background: white;
+      padding: 3rem 2rem;
+      border-radius: 16px;
       text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-10px);
+    }
+    .feature-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
     }
     .feature-card h3 {
-      color: var(--color-primary);
+      font-size: 1.5rem;
       margin-bottom: 1rem;
+      color: var(--landing-secondary);
+    }
+    .feature-card p {
+      font-size: 1.1rem;
+      color: #666;
+      line-height: 1.6;
+    }
+    .cta-section {
+      background-color: var(--landing-primary);
+      color: white;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .cta-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .cta-section p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    .footer {
+      background-color: #222;
+      color: #aaa;
+      text-align: center;
+      padding: 2rem;
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5rem; }
+      .hero p { font-size: 1.2rem; }
+      .features-title { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
-  <!-- Cabeçalho (Header) -->
-  <header class="header">
-    <div class="container header-content">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">A</div>
+  <!-- Header -->
+  <header class="header landing-header">
+    <div class="container header-content" style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--landing-secondary); font-weight: bold; font-size: 1.5rem;">
+        <div class="logo-icon" style="background: var(--landing-primary); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 1.5rem;">A</div>
         Alerta Cidadão
       </a>
-      <nav class="nav-links">
-        <a href="login.html" class="nav-link">Entrar</a>
-        <a href="cadastro.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Criar Conta</a>
+      <nav class="nav-links" style="display: flex; gap: 1rem;">
+        <a href="login.html" class="nav-link" style="color: var(--landing-text); text-decoration: none; font-weight: 500; padding: 0.5rem 1rem;">Entrar</a>
+        <a href="cadastro.html" class="btn-primary" style="background: var(--landing-primary); color: white; padding: 0.5rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: bold;">Criar Conta</a>
       </nav>
     </div>
   </header>
 
-  <!-- Conteúdo Principal -->
-  <main class="container">
-    <section class="hero-section">
-      <h1>O que é o Alerta Cidadão?</h1>
-      <p>Sua plataforma colaborativa para zeladoria urbana. Relate problemas da cidade e acompanhe as soluções da prefeitura.</p>
-      <div class="d--flex flex--center gap--md">
-        <a href="login.html" class="btn-primary" style="font-size: 1.2rem; padding: 15px 30px;">Fazer Login</a>
-        <a href="cadastro.html" class="btn-secondary" style="font-size: 1.2rem; padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white; border-radius: var(--radius-sm); text-decoration: none;">Criar Conta</a>
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <h1>A sua voz transforma a cidade.</h1>
+      <p>O Alerta Cidadão é a ponte direta entre você e a prefeitura. Relate problemas de zeladoria urbana, acompanhe as soluções e ajude a construir um bairro melhor para todos.</p>
+      <div class="hero-buttons">
+        <a href="cadastro.html" class="btn-landing-primary">Comece a Fiscalizar</a>
+        <a href="login.html" class="btn-landing-secondary">Já tenho uma conta</a>
       </div>
     </section>
 
-    <section class="features-grid">
-      <div class="feature-card">
-        <h3>1. Identifique o Problema</h3>
-        <p>Viu um buraco na rua, poste apagado ou lixo acumulado? Tire uma foto e relate o problema na plataforma.</p>
-      </div>
-      <div class="feature-card">
-        <h3>2. Alerte a Comunidade</h3>
-        <p>Seu alerta fica visível para todos. Outros cidadãos podem comentar e apoiar a sua denúncia.</p>
-      </div>
-      <div class="feature-card">
-        <h3>3. Acompanhe a Solução</h3>
-        <p>Acompanhe o status da sua denúncia. Órgãos públicos podem responder oficialmente e resolver o problema.</p>
+    <!-- Features -->
+    <section class="features">
+      <h2 class="features-title">Como o aplicativo funciona?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">📸</span>
+          <h3>1. Identifique</h3>
+          <p>Encontrou um buraco, entulho ou poste apagado? Tire uma foto e registre a ocorrência em poucos segundos pelo celular.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤝</span>
+          <h3>2. Mobilize</h3>
+          <p>Sua denúncia vai para o Feed público. Seus vizinhos podem apoiar e comentar, aumentando a visibilidade do problema.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">✅</span>
+          <h3>3. Resolva</h3>
+          <p>Acompanhe o status em tempo real. Órgãos públicos são notificados e atualizam a plataforma quando o problema é solucionado.</p>
+        </div>
       </div>
     </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+      <h2>Faça parte da mudança hoje mesmo!</h2>
+      <p>Junte-se a milhares de cidadãos que já estão melhorando suas comunidades.</p>
+      <a href="cadastro.html" class="btn-landing-primary" style="color: var(--landing-secondary);">Criar minha conta gratuita</a>
+    </section>
   </main>
-  
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 Alerta Cidadão. Todos os direitos reservados.</p>
+  </footer>
+
   <script>
-    // Se já estiver logado, redirecionar para app.html
+    // Se o usuário já estiver logado, não tem por que ele ver a página de vendas.
+    // Redireciona direto para o feed (app.html).
     const token = localStorage.getItem('token');
-    if (token) {
-      window.location.href = 'app.html';
+    if (token && token !== 'undefined' && token !== 'null') {
+      window.location.replace('app.html');
     }
   </script>
 </body>
 </html>
-
