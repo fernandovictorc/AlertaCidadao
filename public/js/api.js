@@ -43,7 +43,7 @@ async function fetchAPI(endpoint, method = 'GET', data = null) {
       } catch (err) {
           console.error('Falha ao fazer parse do erro como JSON', err);
       }
-      throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+      throw new Error((errorData.message || `Erro HTTP: ${response.status}`) + ` na rota ${API_BASE_URL}${endpoint}`);
     }
 
     return await response.json();
