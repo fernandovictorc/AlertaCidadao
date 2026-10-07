@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Alerta Cidadão</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+  <style>
+    .admin-select {
+      padding: 0.5rem;
+      border-radius: var(--radius--md);
+      border: 1px solid var(--color--border);
+      background-color: var(--color--bg--elevated);
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Painel Administrativo</h2>
+    <p>Gerencie todas as denúncias da plataforma.</p>
+    <div class="feed-container d--flex flex--dir--column gap--md" style="margin-top: 2rem;">
+      <p>Carregando denúncias...</p>
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script type="module">
+    import { getAllDenunciasAdmin, updateDenunciaStatus } from './js/api.js';
+
+    // Proteção de rota do lado do cliente (simples)
+    const user = getUser();
+    if (!user || user.perfil !== 'admin') {
+      alert("Acesso restrito a administradores.");
+      window.location.href = 'index.html';
+    }
+
+    // Função para alterar estado
+    window.changeStatus = async function(id, selectElement) {
+      const newStatus = selectElement.value;
+      try {
+        await updateDenunciaStatus(id, { estado: newStatus });
+        alert('Estado atualizado com sucesso!');
+      } catch (err) {
+        alert('Erro ao atualizar estado: ' + err.message);
+        // Retorna ao valor anterior ou recarrega (simplificado: recarrega a página)
+        window.location.reload();
+      }
+    };
+
+    function renderAdminFeed(denuncias, container) {
+      container.innerHTML = '';
+      
+      if (denuncias.length === 0) {
+          container.innerHTML = '<p>Nenhuma denúncia encontrada.</p>';
+          return;
+      }
+
+      const estados = ['Não Respondido', 'Em Análise', 'Resolvido'];
+
+      denuncias.forEach(denuncia => {
+          const article = document.createElement('article');
+          article.className = 'product-card';
+          
+          const imageUrl = (denuncia.midias && denuncia.midias.length > 0) ? denuncia.midias[0].url_ou_base64 : 'assets/images/default.jpg';
+          
+          let optionsHtml = '';
+          estados.forEach(estado => {
+            const selected = (denuncia.estado === estado) ? 'selected' : '';
+            optionsHtml += `<option value="${estado}" ${selected}>${estado}</option>`;
+          });
+
+          article.innerHTML = `
+              <img src="${imageUrl}" alt="Imagem da denúncia" class="product-card-thumbnail" style="object-fit: cover;">
+              <div class="product-card-content">
+                  <a href="denuncia-detalhes.html?id=${denuncia.id}" style="color: inherit; text-decoration: none;">
+                      <h3>${denuncia.titulo} ${denuncia.privado ? '(Privado)' : ''}</h3>
+                  </a>
+                  <p>${denuncia.descricao}</p>
+                  <div class="meta-info" style="align-items: center;">
+                    <span class="tag">${denuncia.bairro}</span>
+                    <div class="comment-count">
+                      Por: ${denuncia.nome_autor}
+                    </div>
+                    <select class="admin-select" onchange="changeStatus(${denuncia.id}, this)">
+                      ${optionsHtml}
+                    </select>
+                  </div>
+              </div>
+          `;
+          
+          container.appendChild(article);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateHeaderAuthUI();
+      
+      const feedContainer = document.querySelector('.feed-container');
+      try {
+        const response = await getAllDenunciasAdmin();
+        renderAdminFeed(response.denuncias, feedContainer);
+      } catch (err) {
+        feedContainer.innerHTML = '<p>Erro ao carregar denúncias. Verifique se possui permissão.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Denúncia - Alerta Cidadão</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="login.html" class="btn-primary">Entrar</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container" style="padding-top: var(--space--xxl); padding-bottom: var(--space--xxl);">
+    <article id="denuncia-detalhe" class="feed-container">
+      <p>Carregando denúncia...</p>
+    </article>
+  </main>
+  <script src="js/auth.js?v=2"></script>
+  <script src="js/ui.js?v=2"></script>
+  <script type="module">
+    import { deleteDenuncia, getComentarios, getDenunciaById, postComentario, toggleApoio, deleteComentario } from './js/api.js?v=2';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateHeaderAuthUI();
+      const id = new URLSearchParams(window.location.search).get('id');
+      const article = document.getElementById('denuncia-detalhe');
+
+      if (!id) {
+        article.textContent = 'Denúncia não especificada.';
+        return;
+      }
+
+      try {
+        const { denuncia } = await getDenunciaById(id);
+        renderDenuncia(article, denuncia);
+        try {
+          await loadComentarios(id);
+        } catch (error) {
+          const comments = document.getElementById('comentarios-lista');
+          if (comments) comments.textContent = `Não foi possível carregar os comentários: ${error.message}`;
+        }
+      } catch (error) {
+        article.textContent = `Não foi possível carregar a denúncia: ${error.message}`;
+      }
+    });
+
+    function renderDenuncia(article, denuncia) {
+      article.replaceChildren();
+
+      const status = document.createElement('span');
+      status.className = 'tag';
+      status.textContent = denuncia.estado;
+      article.appendChild(status);
+
+      const title = document.createElement('h1');
+      title.textContent = denuncia.titulo;
+      article.appendChild(title);
+
+      const description = document.createElement('p');
+      description.textContent = denuncia.descricao;
+      article.appendChild(description);
+
+      const location = document.createElement('p');
+      location.textContent = `Endereço: ${denuncia.morada}, ${denuncia.bairro}`;
+      article.appendChild(location);
+
+      const user = getUser();
+      if (user && String(user.id) === String(denuncia.id_utilizador)) {
+        const actions = document.createElement('div');
+        actions.className = 'report-owner-actions';
+        const editLink = document.createElement('a');
+        editLink.className = 'btn-secondary';
+        editLink.href = `nova-denuncia.html?id=${encodeURIComponent(denuncia.id)}`;
+        editLink.textContent = 'Editar';
+        actions.appendChild(editLink);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'btn-danger';
+        deleteButton.textContent = 'Excluir denúncia';
+        deleteButton.addEventListener('click', async () => {
+          if (!confirm('Tem certeza de que deseja excluir esta denúncia? Esta ação não pode ser desfeita.')) return;
+          deleteButton.disabled = true;
+          try {
+            await deleteDenuncia(denuncia.id);
+            window.location.href = 'perfil.html';
+          } catch (error) {
+            alert(`Não foi possível excluir a denúncia: ${error.message}`);
+            deleteButton.disabled = false;
+          }
+        });
+        actions.appendChild(deleteButton);
+        article.appendChild(actions);
+      }
+
+      const media = document.createElement('div');
+      media.className = 'report-media';
+      (denuncia.midias || []).forEach(item => {
+        const element = document.createElement(item.tipo === 'video' ? 'video' : 'img');
+        element.src = item.url_ou_base64;
+        element.className = 'report-media-item';
+        if (item.tipo === 'video') {
+          element.controls = true;
+        } else {
+          element.alt = 'Imagem anexada à denúncia';
+        }
+        media.appendChild(element);
+      });
+      if (media.childElementCount > 0) {
+        article.appendChild(media);
+      }
+
+      if (denuncia.resposta_orgao) {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'official-response';
+        responseDiv.style.background = '#e8f5e9';
+        responseDiv.style.padding = '15px';
+        responseDiv.style.borderLeft = '4px solid var(--color-primary)';
+        responseDiv.style.marginTop = '15px';
+        responseDiv.innerHTML = `<strong>Resposta Oficial (Prefeitura):</strong><p>${denuncia.resposta_orgao}</p>`;
+        article.appendChild(responseDiv);
+      }
+
+      if (user && (user.role === 'admin' || user.perfil === 'admin')) {
+        const adminSection = document.createElement('div');
+        adminSection.className = 'admin-controls';
+        adminSection.style.background = '#f9f9f9';
+        adminSection.style.padding = '15px';
+        adminSection.style.marginTop = '20px';
+        adminSection.style.border = '1px solid #ddd';
+        adminSection.innerHTML = `
+          <h3>Controle do Administrador</h3>
+          <div class="form-group">
+            <label class="form-label">Status da Denúncia</label>
+            <select id="admin-status" class="form-input">
+              <option value="Pendente" ${denuncia.estado === 'Pendente' ? 'selected' : ''}>Pendente</option>
+              <option value="Em Andamento" ${denuncia.estado === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+              <option value="Concluído" ${denuncia.estado === 'Concluído' ? 'selected' : ''}>Concluído</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resposta Oficial</label>
+            <textarea id="admin-resposta" class="form-textarea" rows="3">${denuncia.resposta_orgao || ''}</textarea>
+          </div>
+          <button id="admin-save-btn" class="btn-primary">Salvar Atualizações</button>
+        `;
+        article.appendChild(adminSection);
+
+        adminSection.querySelector('#admin-save-btn').addEventListener('click', async () => {
+          const novoStatus = document.getElementById('admin-status').value;
+          const novaResposta = document.getElementById('admin-resposta').value;
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`/api/denuncias/${denuncia.id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: novoStatus, resposta_orgao: novaResposta })
+            });
+            if (!res.ok) throw new Error('Erro ao atualizar pelo admin');
+            alert('Atualizado com sucesso!');
+            window.location.reload();
+          } catch (e) {
+            alert(e.message);
+          }
+        });
+      }
+
+      const supportButton = document.createElement('button');
+      supportButton.type = 'button';
+      supportButton.className = 'btn-secondary';
+      supportButton.textContent = `Apoiar (${denuncia.apoios_contagem || 0})`;
+      supportButton.addEventListener('click', async () => {
+        if (!isAuthenticated()) {
+          window.location.href = 'login.html';
+          return;
+        }
+        try {
+          const result = await toggleApoio(denuncia.id);
+          denuncia.apoios_contagem = Math.max(0, (denuncia.apoios_contagem || 0) + (result.apoiado ? 1 : -1));
+          supportButton.textContent = `Apoiar (${denuncia.apoios_contagem})`;
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+      article.appendChild(supportButton);
+
+      const comments = document.createElement('section');
+      comments.innerHTML = '<h2>Comentários</h2><div id="comentarios-lista"></div>';
+      const textarea = document.createElement('textarea');
+      textarea.id = 'novo-comentario';
+      textarea.className = 'form-textarea';
+      textarea.placeholder = 'Escreva um comentário';
+      comments.appendChild(textarea);
+
+      const commentButton = document.createElement('button');
+      commentButton.type = 'button';
+      commentButton.className = 'btn-primary';
+      commentButton.textContent = 'Comentar';
+      commentButton.addEventListener('click', async () => {
+        if (!isAuthenticated()) {
+          window.location.href = 'login.html';
+          return;
+        }
+        if (!textarea.value.trim()) return;
+
+        commentButton.disabled = true;
+        try {
+          await postComentario(denuncia.id, { texto: textarea.value.trim() });
+          textarea.value = '';
+          await loadComentarios(denuncia.id);
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          commentButton.disabled = false;
+        }
+      });
+      comments.appendChild(commentButton);
+      article.appendChild(comments);
+    }
+
+    async function loadComentarios(id) {
+      const container = document.getElementById('comentarios-lista');
+      if (!container) return;
+      
+      try {
+        const { comentarios } = await getComentarios(id);
+        container.replaceChildren();
+
+        if (!comentarios || !Array.isArray(comentarios)) {
+            container.textContent = 'Erro ao ler comentários da resposta.';
+            return;
+        }
+
+        if (comentarios.length === 0) {
+          container.textContent = 'Nenhum comentário ainda.';
+          return;
+        }
+
+        const user = getUser();
+
+        comentarios.forEach(comentario => {
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+        item.style.marginBottom = '1rem';
+        
+        const textWrapper = document.createElement('p');
+        const author = document.createElement('strong');
+        const authorLink = document.createElement('a');
+        authorLink.href = `perfil.html?id=${comentario.id_utilizador}`;
+        authorLink.textContent = comentario.nome_autor;
+        authorLink.style.textDecoration = 'none';
+        authorLink.style.color = 'var(--color-primary)';
+        
+        author.appendChild(authorLink);
+        author.appendChild(document.createTextNode(': '));
+        textWrapper.append(author, document.createTextNode(comentario.texto));
+        item.appendChild(textWrapper);
+
+        if (user && (String(user.id) === String(comentario.id_utilizador) || user.role === 'admin' || user.perfil === 'admin')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-danger';
+            deleteBtn.style.padding = '5px 10px';
+            deleteBtn.style.fontSize = '0.8rem';
+            deleteBtn.innerHTML = '🗑 Excluir';
+            deleteBtn.onclick = async () => {
+                if (confirm('Excluir comentário?')) {
+                    try {
+                        const commentId = comentario.id || comentario.id_comentario;
+                        if (!commentId) {
+                            console.error('ID do comentário não encontrado no objeto:', comentario);
+                            alert('Erro: ID do comentário não encontrado.');
+                            return;
+                        }
+                        await deleteComentario(id, commentId);
+                        await loadComentarios(id);
+                    } catch (err) {
+                        alert(err.message);
+                    }
+                }
+            };
+            item.appendChild(deleteBtn);
+        }
+        
+        container.appendChild(item);
+      });
+      } catch (error) {
+        container.textContent = 'Erro ao carregar comentários: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+/* ==========================================================================
+   CSS Agnóstico - Utilitários Flexbox
+   Padrão de nomenclatura: BEM modificado com traços duplos (--).
+   Exemplos: .d--flex, .flex--1, .justify--content--center
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Display Flex
+   -------------------------------------------------------------------------- */
+.d--flex {
+  display: flex;
+}
+
+.d--inline-flex {
+  display: inline-flex;
+}
+
+/* --------------------------------------------------------------------------
+   Flex Direction
+   -------------------------------------------------------------------------- */
+.flex--dir--row {
+  flex-direction: row;
+}
+
+.flex--dir--row-reverse {
+  flex-direction: row-reverse;
+}
+
+.flex--dir--column {
+  flex-direction: column;
+}
+
+.flex--dir--column-reverse {
+  flex-direction: column-reverse;
+}
+
+/* --------------------------------------------------------------------------
+   Flex Wrap
+   -------------------------------------------------------------------------- */
+.flex--wrap--nowrap {
+  flex-wrap: nowrap;
+}
+
+.flex--wrap--wrap {
+  flex-wrap: wrap;
+}
+
+.flex--wrap--wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+
+/* --------------------------------------------------------------------------
+   Justify Content (Eixo Principal)
+   -------------------------------------------------------------------------- */
+.justify--content--start {
+  justify-content: flex-start;
+}
+
+.justify--content--end {
+  justify-content: flex-end;
+}
+
+.justify--content--center {
+  justify-content: center;
+}
+
+.justify--content--space-between {
+  justify-content: space-between;
+}
+
+.justify--content--space-around {
+  justify-content: space-around;
+}
+
+.justify--content--space-evenly {
+  justify-content: space-evenly;
+}
+
+/* --------------------------------------------------------------------------
+   Align Items (Eixo Transversal)
+   -------------------------------------------------------------------------- */
+.align--items--start {
+  align-items: flex-start;
+}
+
+.align--items--end {
+  align-items: flex-end;
+}
+
+.align--items--center {
+  align-items: center;
+}
+
+.align--items--baseline {
+  align-items: baseline;
+}
+
+.align--items--stretch {
+  align-items: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   Align Content (Distribuição de múltiplas linhas)
+   -------------------------------------------------------------------------- */
+.align--content--start {
+  align-content: flex-start;
+}
+
+.align--content--end {
+  align-content: flex-end;
+}
+
+.align--content--center {
+  align-content: center;
+}
+
+.align--content--space-between {
+  align-content: space-between;
+}
+
+.align--content--space-around {
+  align-content: space-around;
+}
+
+.align--content--stretch {
+  align-content: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   Align Self (Alinhamento individual do item)
+   -------------------------------------------------------------------------- */
+.align--self--auto {
+  align-self: auto;
+}
+
+.align--self--start {
+  align-self: flex-start;
+}
+
+.align--self--end {
+  align-self: flex-end;
+}
+
+.align--self--center {
+  align-self: center;
+}
+
+.align--self--baseline {
+  align-self: baseline;
+}
+
+.align--self--stretch {
+  align-self: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   Flex (Shorthand)
+   -------------------------------------------------------------------------- */
+.flex--1 {
+  flex: 1 1 0%;
+}
+
+.flex--auto {
+  flex: 1 1 auto;
+}
+
+.flex--initial {
+  flex: 0 1 auto;
+}
+
+.flex--none {
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Flex Grow
+   -------------------------------------------------------------------------- */
+.flex--grow--0 {
+  flex-grow: 0;
+}
+
+.flex--grow--1 {
+  flex-grow: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Flex Shrink
+   -------------------------------------------------------------------------- */
+.flex--shrink--0 {
+  flex-shrink: 0;
+}
+
+.flex--shrink--1 {
+  flex-shrink: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Flex Order
+   -------------------------------------------------------------------------- */
+.order--first {
+  order: -9999;
+}
+
+.order--last {
+  order: 9999;
+}
+
+.order--0 {
+  order: 0;
+}
+
+.order--1 {
+  order: 1;
+}
+
+.order--2 {
+  order: 2;
+}
+
+.order--3 {
+  order: 3;
+}
+
+/* --------------------------------------------------------------------------
+   Gaps (Utilitários auxiliares frequentemente usados com flexbox)
+   -------------------------------------------------------------------------- */
+.gap--xs {
+  gap: 0.25rem; /* 4px */
+}
+
+.gap--sm {
+  gap: 0.5rem;  /* 8px */
+}
+
+.gap--md {
+  gap: 1rem;    /* 16px */
+}
+
+.gap--lg {
+  gap: 1.5rem;  /* 24px */
+}
+
+.gap--xl {
+  gap: 2rem;    /* 32px */
+}
+
+.gap--xxl {
+  gap: 3rem;    /* 48px */
+}
+

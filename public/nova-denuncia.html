@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Denúncia - Alerta Cidadão</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+  <script src="js/auth.js"></script>
+  <script>protectRoute();</script>
+</head>
+<body>
+  <!-- Cabeçalho (Header) -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link" style="color: var(--color--text--main); font-weight: var(--font--weight--semibold);">Nova Denúncia</a>
+        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="container">
+    <div class="form-container form-container-lg">
+      <div class="form-header">
+        <h2 id="form-title">Reportar um Problema</h2>
+        <p id="form-description">Preencha os detalhes para que o órgão responsável possa agir.</p>
+      </div>
+
+      <form id="denuncia-form" action="#" method="POST">
+        
+        <div class="form-group">
+          <label for="titulo" class="form-label">Título da Denúncia</label>
+          <input type="text" id="titulo" name="titulo" class="form-input" placeholder="Ex: Buraco perigoso na via" required>
+        </div>
+
+        <div class="form-group">
+          <label for="descricao" class="form-label">Descrição detalhada</label>
+          <textarea id="descricao" name="descricao" class="form-textarea" placeholder="Descreva o problema com o máximo de detalhes..." required></textarea>
+        </div>
+
+        <div class="d--flex flex--wrap--wrap gap--md">
+          <div class="form-group flex--1">
+            <label for="endereco" class="form-label">Endereço</label>
+            <input type="text" id="endereco" name="endereco" class="form-input" placeholder="Rua, Avenida..." required>
+          </div>
+          <div class="form-group flex--1">
+            <label for="bairro" class="form-label">Bairro</label>
+            <input type="text" id="bairro" name="bairro" class="form-input" placeholder="Nome do bairro" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Anexos de Mídia (Máx. 2 fotos e 1 vídeo, 10MB)</label>
+          <input type="file" id="midia" name="midia" class="form-input" accept="image/*,video/*" multiple>
+          <small style="color: var(--color--text--muted); font-size: 12px;">Selecione os arquivos comprobatórios para ajudar na análise.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="notificacao" class="form-label">Preferência de Notificações</label>
+          <select id="notificacao" name="notificacao" class="form-select">
+            <option value="whatsapp">WhatsApp</option>
+            <option value="email">E-mail</option>
+            <option value="none">Não receber notificações</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Controles de Privacidade</label>
+          <label class="form-checkbox">
+            <input type="checkbox" name="anonimo">
+            <span><strong>Denúncia Anônima:</strong> Ocultar meu nome e foto na postagem pública.</span>
+          </label>
+          <label class="form-checkbox">
+            <input type="checkbox" name="privada">
+            <span><strong>Denúncia Privada:</strong> Ocultar do feed social (visível apenas para o órgão público).</span>
+          </label>
+        </div>
+
+        <button id="submit-denuncia" type="submit" class="btn-primary btn-block" style="margin-top: var(--space--xl);">Enviar Denúncia</button>
+      </form>
+    </div>
+  </main>
+  
+  <script src="js/ui.js"></script>
+  <script type="module">
+    import { getDenunciaById, postDenuncia, updateDenuncia } from './js/api.js';
+
+    const form = document.getElementById('denuncia-form');
+    const params = new URLSearchParams(window.location.search);
+    const reportId = params.get('id');
+    const submitButton = document.getElementById('submit-denuncia');
+    if (reportId) submitButton.disabled = true;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateHeaderAuthUI();
+      if (!reportId) return;
+
+      document.getElementById('form-title').textContent = 'Editar denúncia';
+      document.getElementById('form-description').textContent = 'Altere os dados da sua denúncia. O estado atual será preservado.';
+      submitButton.textContent = 'Salvar alterações';
+
+      ['midia', 'notificacao', 'anonimo', 'privada'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.closest('.form-group').hidden = true;
+      });
+      document.querySelector('input[name="anonimo"]').closest('.form-group').hidden = true;
+
+      try {
+        const { denuncia } = await getDenunciaById(reportId);
+        const user = getUser();
+        if (!user || String(user.id) !== String(denuncia.id_utilizador)) {
+          alert('Você só pode editar suas próprias denúncias.');
+          window.location.href = 'perfil.html';
+          return;
+        }
+
+        document.getElementById('titulo').value = denuncia.titulo;
+        document.getElementById('descricao').value = denuncia.descricao;
+        document.getElementById('endereco').value = denuncia.morada;
+        document.getElementById('bairro').value = denuncia.bairro;
+        submitButton.disabled = false;
+      } catch (error) {
+        alert(`Não foi possível carregar a denúncia: ${error.message}`);
+        window.location.href = 'perfil.html';
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      submitButton.disabled = true;
+      submitButton.textContent = reportId ? 'Salvando...' : 'Enviando...';
+
+      const dados = {
+        titulo: document.getElementById('titulo').value.trim(),
+        descricao: document.getElementById('descricao').value.trim(),
+        morada: document.getElementById('endereco').value.trim(),
+        bairro: document.getElementById('bairro').value.trim()
+      };
+
+      try {
+        if (reportId) {
+          await updateDenuncia(reportId, dados);
+          alert('Denúncia atualizada com sucesso.');
+          window.location.href = 'perfil.html';
+          return;
+        }
+
+        const files = document.getElementById('midia').files;
+        const midias = [];
+        if (files.length > 0) {
+          const file = files[0];
+          const url_ou_base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Não foi possível ler o arquivo selecionado.'));
+            reader.readAsDataURL(file);
+          });
+          midias.push({ tipo: file.type.includes('video') ? 'video' : 'foto', url_ou_base64 });
+        }
+
+        await postDenuncia({
+          ...dados,
+          notificacao_pref: document.getElementById('notificacao').value,
+          anonimo: document.querySelector('input[name="anonimo"]').checked,
+          privado: document.querySelector('input[name="privada"]').checked,
+          midias
+        });
+        alert('Denúncia enviada com sucesso.');
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert(`Não foi possível salvar a denúncia: ${error.message}`);
+        submitButton.disabled = false;
+        submitButton.textContent = reportId ? 'Salvar alterações' : 'Enviar Denúncia';
+      }
+    });
+  </script>
+</body>
+</html>

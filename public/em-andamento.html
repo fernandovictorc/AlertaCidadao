@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerta Cidadão - Em Andamento</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+</head>
+<body>
+  <!-- Cabeçalho (Header) -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">A</div>
+        Alerta Cidadão
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="container app-layout">
+    <div class="main-content">
+      <div class="tabs d--flex gap--lg">
+        <a href="app.html" class="tab-link">Feed</a>
+        <a href="em-andamento.html" class="tab-link active">Em Andamento</a>
+        <a href="concluidas.html" class="tab-link">Obras Concluídas</a>
+      </div>
+
+      <!-- Feed de Denúncias -->
+      <div class="feed-container d--flex flex--dir--column gap--md" data-status="progress" aria-live="polite">
+        <p>Carregando denúncias...</p>
+      </div>
+    </div>
+
+    <aside class="sidebar-ads">
+      <h3 style="margin-top: 0; font-size: 1.1rem; color: #555;">Publicidade</h3>
+      <div class="ad-banner">Espaço Patrocinado</div>
+      <div class="ad-banner">Espaço Patrocinado</div>
+    </aside>
+  </main>
+  <script src="js/auth.js?v=2"></script>
+  <script src="js/ui.js?v=2"></script>
+  <script type="module" src="js/feed.js?v=3"></script>
+</body>
+</html>
