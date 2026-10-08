@@ -774,6 +774,7 @@ a:hover {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  box-sizing: border-box;
 }
 
 .drop-zone:hover, .drop-zone.dragover {
