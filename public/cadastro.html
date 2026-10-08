@@ -79,6 +79,12 @@
       const senha = document.getElementById('password').value;
       const submitBtn = document.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerText;
+      
+      if (!isAtLeast16YearsOld(data_nascimento)) {
+        alert('Acesso negado: Você precisa ter pelo menos 16 anos para criar uma conta no Alerta Cidadão.');
+        return;
+      }
+
       submitBtn.disabled = true;
       submitBtn.innerText = 'Cadastrando...';
 
