@@ -160,3 +160,32 @@ exports.getUserById = async (req, res) => {
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
+
+exports.updateAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { email, senha } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ message: 'E-mail é obrigatório.' });
+        }
+
+        let senhaHash = null;
+        if (senha && senha.trim() !== '') {
+            senhaHash = await bcrypt.hash(senha, 10);
+        }
+
+        const updatedUser = await userModel.updateUserAccount(userId, email, senhaHash);
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.json({ message: 'Conta atualizada com sucesso.', user: updatedUser });
+    } catch (error) {
+        if (error.code === '23505') { // UNIQUE constraint violation in PostgreSQL
+            return res.status(400).json({ message: 'Este e-mail já está em uso.' });
+        }
+        console.error('Erro ao atualizar conta:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
