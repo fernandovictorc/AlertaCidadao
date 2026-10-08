@@ -26,6 +26,49 @@
       <p>Carregando denúncia...</p>
     </article>
   </main>
+
+  <!-- Modal de Pagamento / Crowdfunding (Fase 3) -->
+  <div id="modal-pagamento" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <h3 style="margin-top: 0; color: var(--color-primary, #22c55e); text-align: center;">Patrocinar Resolução</h3>
+      <p style="text-align: center; color: var(--color-text-muted, #4b587c); margin-bottom: 20px;">Escolha o valor e o método de pagamento para apoiar esta causa.</p>
+      
+      <div class="form-group">
+        <label class="form-label">Valor da Contribuição (R$)</label>
+        <select class="form-input" id="valor-doacao">
+          <option value="10">R$ 10,00</option>
+          <option value="20">R$ 20,00</option>
+          <option value="50">R$ 50,00</option>
+          <option value="100">R$ 100,00</option>
+          <option value="outro">Outro valor...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Método de Pagamento</label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn-secondary" style="flex: 1;">PIX</button>
+          <button type="button" class="btn-secondary" style="flex: 1;">Cartão</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button id="btn-cancelar-pagamento" class="btn-secondary" style="flex: 1;">Cancelar</button>
+        <button id="btn-confirmar-pagamento" class="btn-primary" style="flex: 1;">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btn-cancelar-pagamento')?.addEventListener('click', () => {
+        document.getElementById('modal-pagamento').style.display = 'none';
+      });
+      document.getElementById('btn-confirmar-pagamento')?.addEventListener('click', () => {
+        alert('Pagamento simulado com sucesso! Obrigado por apoiar.');
+        document.getElementById('modal-pagamento').style.display = 'none';
+      });
+    });
+  </script>
   <script src="js/auth.js?v=2"></script>
   <script src="js/ui.js?v=2"></script>
   <script type="module">
@@ -178,6 +221,63 @@
           }
         });
       }
+
+      // Crowdfunding Section (Fase 3)
+      const crowdfundingSection = document.createElement('div');
+      crowdfundingSection.className = 'crowdfunding-section';
+      crowdfundingSection.style.background = '#f8fafc';
+      crowdfundingSection.style.padding = '20px';
+      crowdfundingSection.style.marginTop = '25px';
+      crowdfundingSection.style.marginBottom = '25px';
+      crowdfundingSection.style.borderRadius = '8px';
+      crowdfundingSection.style.border = '1px solid var(--color-border, #eaeaea)';
+      
+      const crowdfundingTitle = document.createElement('h3');
+      crowdfundingTitle.textContent = 'Apoio Comunitário / Crowdfunding';
+      crowdfundingTitle.style.marginTop = '0';
+      crowdfundingTitle.style.color = 'var(--color-primary, #22c55e)';
+      crowdfundingSection.appendChild(crowdfundingTitle);
+
+      const crowdfundingDesc = document.createElement('p');
+      crowdfundingDesc.textContent = 'Ajude a financiar a resolução rápida deste problema (ex: contratar caçamba, equipe de limpeza).';
+      crowdfundingDesc.style.color = 'var(--color-text-muted, #4b587c)';
+      crowdfundingSection.appendChild(crowdfundingDesc);
+
+      const progressWrapper = document.createElement('div');
+      progressWrapper.style.background = '#e2e8f0';
+      progressWrapper.style.borderRadius = '10px';
+      progressWrapper.style.height = '12px';
+      progressWrapper.style.width = '100%';
+      progressWrapper.style.marginBottom = '10px';
+      progressWrapper.style.overflow = 'hidden';
+      
+      const progressBar = document.createElement('div');
+      progressBar.style.background = 'var(--color-primary, #22c55e)';
+      progressBar.style.width = '30%'; // Exemplo visual
+      progressBar.style.height = '100%';
+      progressWrapper.appendChild(progressBar);
+      crowdfundingSection.appendChild(progressWrapper);
+
+      const progressText = document.createElement('div');
+      progressText.style.display = 'flex';
+      progressText.style.justifyContent = 'space-between';
+      progressText.style.fontSize = '14px';
+      progressText.style.fontWeight = '600';
+      progressText.style.color = 'var(--color-text-main, #333)';
+      progressText.innerHTML = '<span>R$ 150,00 arrecadados</span><span>Meta: R$ 500,00</span>';
+      crowdfundingSection.appendChild(progressText);
+
+      const patrocinaBtn = document.createElement('button');
+      patrocinaBtn.className = 'btn-primary';
+      patrocinaBtn.style.marginTop = '20px';
+      patrocinaBtn.style.width = '100%';
+      patrocinaBtn.textContent = 'Patrocinar Resolução';
+      patrocinaBtn.addEventListener('click', () => {
+        document.getElementById('modal-pagamento').style.display = 'flex';
+      });
+      crowdfundingSection.appendChild(patrocinaBtn);
+
+      article.appendChild(crowdfundingSection);
 
       const supportButton = document.createElement('button');
       supportButton.type = 'button';
