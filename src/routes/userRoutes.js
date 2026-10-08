@@ -24,6 +24,7 @@ router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
 router.get('/profile', verifyToken, userController.getUserProfile);
 router.put('/profile', verifyToken, userController.updateProfile);
+router.put('/account', verifyToken, userController.updateAccount);
 router.patch('/primeiro-acesso', verifyToken, userController.disablePrimeiroAcesso);
 router.get('/:id', optionalVerifyToken, userController.getUserById);
 
