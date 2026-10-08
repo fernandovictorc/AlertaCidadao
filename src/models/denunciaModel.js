@@ -7,6 +7,7 @@ const createTable = async () => {
             id_utilizador INTEGER REFERENCES utilizadores(id) ON DELETE CASCADE,
             titulo VARCHAR(150) NOT NULL,
             descricao TEXT NOT NULL,
+            categoria VARCHAR(100) DEFAULT 'Outros',
             morada VARCHAR(255) NOT NULL,
             bairro VARCHAR(100) NOT NULL,
             estado VARCHAR(50) DEFAULT 'Não Respondido',
@@ -21,19 +22,20 @@ const createTable = async () => {
     try {
         await db.query(`ALTER TABLE denuncias ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Pendente';`);
         await db.query(`ALTER TABLE denuncias ADD COLUMN IF NOT EXISTS resposta_orgao TEXT DEFAULT NULL;`);
+        await db.query(`ALTER TABLE denuncias ADD COLUMN IF NOT EXISTS categoria VARCHAR(100) DEFAULT 'Outros';`);
     } catch (err) {
         console.error('Erro ao adicionar colunas em denuncias:', err);
     }
 };
 
 const createDenuncia = async (denunciaData) => {
-    const { id_utilizador, titulo, descricao, morada, bairro, anonimo, privado, notificacao_pref } = denunciaData;
+    const { id_utilizador, titulo, descricao, categoria, morada, bairro, anonimo, privado, notificacao_pref } = denunciaData;
     const query = `
-        INSERT INTO denuncias (id_utilizador, titulo, descricao, morada, bairro, anonimo, privado, notificacao_pref)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO denuncias (id_utilizador, titulo, descricao, categoria, morada, bairro, anonimo, privado, notificacao_pref)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *;
     `;
-    const values = [id_utilizador, titulo, descricao, morada, bairro, anonimo, privado, notificacao_pref];
+    const values = [id_utilizador, titulo, descricao, categoria || 'Outros', morada, bairro, anonimo, privado, notificacao_pref];
     const result = await db.query(query, values);
     return result.rows[0];
 };
@@ -104,14 +106,14 @@ const updateStatus = async (id, status, resposta_orgao) => {
 };
 
 const updateOwnDenuncia = async (id, id_utilizador, denunciaData) => {
-    const { titulo, descricao, morada, bairro } = denunciaData;
+    const { titulo, descricao, categoria, morada, bairro } = denunciaData;
     const query = `
         UPDATE denuncias
-        SET titulo = $1, descricao = $2, morada = $3, bairro = $4
-        WHERE id = $5 AND id_utilizador = $6
+        SET titulo = $1, descricao = $2, categoria = $3, morada = $4, bairro = $5
+        WHERE id = $6 AND id_utilizador = $7
         RETURNING *;
     `;
-    const result = await db.query(query, [titulo, descricao, morada, bairro, id, id_utilizador]);
+    const result = await db.query(query, [titulo, descricao, categoria, morada, bairro, id, id_utilizador]);
     return result.rows[0];
 };
 
