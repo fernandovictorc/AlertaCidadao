@@ -31,7 +31,7 @@
       <h3 style="margin-top: 0; color: var(--color-primary, #22c55e);">Bem-vindo!</h3>
       <p style="margin-bottom: 0; color: #333;">Comece fazendo sua primeira denúncia clicando aqui.</p>
       <!-- Uma setinha apontando para o botão -->
-      <div style="position: absolute; top: -10px; right: 20px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid white;"></div>
+      <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid white;"></div>
     </div>
   </div>
 
@@ -77,17 +77,34 @@
           btnNovaDenuncia.style.padding = '8px 12px';
           btnNovaDenuncia.style.borderRadius = '4px';
 
-          btnNovaDenuncia.addEventListener('click', async (e) => {
-            // Se o usuário clicar, primeiro desativamos o flag no banco
+          // Alinha o popup embaixo do botão dinamicamente
+          setTimeout(() => {
+            const popup = overlay.querySelector('div');
+            const rect = btnNovaDenuncia.getBoundingClientRect();
+            popup.style.top = (rect.bottom + 15) + 'px';
+            popup.style.left = (rect.left - 50) + 'px';
+            popup.style.right = 'auto'; // Remove o valor fixo
+          }, 100); // pequeno delay para dar tempo do header renderizar
+
+          const dismissOverlay = async () => {
+            overlay.style.display = 'none';
+            btnNovaDenuncia.style.zIndex = '';
             try {
               await disablePrimeiroAcesso();
-              // Atualizamos no localStorage para não mostrar de novo caso ele volte
               user.primeiro_acesso = false;
               localStorage.setItem('user', JSON.stringify(user));
             } catch (err) {
               console.error('Falha ao desativar primeiro acesso', err);
             }
-            // A navegação padrão ocorrerá, levando o usuário para a página de nova denúncia
+          };
+
+          // Fecha ao clicar no overlay escuro
+          overlay.addEventListener('click', dismissOverlay);
+          
+          // Se o usuário clicar no botão de Nova Denúncia
+          btnNovaDenuncia.addEventListener('click', async (e) => {
+            await dismissOverlay();
+            // A navegação padrão ocorrerá
           });
         }
       }
