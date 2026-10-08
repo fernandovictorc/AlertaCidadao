@@ -43,10 +43,29 @@
         <label for="is_private" class="form-label" style="margin-bottom: 0;">Deixar meu Perfil Privado</label>
       </div>
 
-      <button type="submit" class="btn-primary" style="margin-top: 10px;">Salvar Alterações</button>
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Salvar Perfil</button>
     </form>
     
     <div id="status-message" style="margin-top: 15px; text-align: center; color: var(--color-primary); font-weight: bold;"></div>
+
+    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);">
+
+    <h2 style="color: var(--color-primary); margin-bottom: 20px; text-align: center;">Segurança da Conta</h2>
+    <form id="edit-account-form" class="d--flex flex--dir--column gap--md">
+      <div class="form-group">
+        <label for="email" class="form-label">E-mail</label>
+        <input type="email" id="email" class="form-input" required>
+      </div>
+
+      <div class="form-group">
+        <label for="senha" class="form-label">Nova Senha</label>
+        <input type="password" id="senha" class="form-input" placeholder="Deixe em branco para não alterar">
+      </div>
+
+      <button type="submit" class="btn-primary" style="margin-top: 10px; background-color: var(--color-secondary, #3b82f6);">Salvar Conta</button>
+    </form>
+
+    <div id="account-status-message" style="margin-top: 15px; text-align: center; color: var(--color-primary); font-weight: bold;"></div>
   </main>
 
   <script type="module">
@@ -62,7 +81,13 @@
       
       const token = localStorage.getItem('token');
 
-      // Carregar dados atuais
+      // --- Conta Form ---
+      const accountForm = document.getElementById('edit-account-form');
+      const emailInput = document.getElementById('email');
+      const senhaInput = document.getElementById('senha');
+      const accountStatusMsg = document.getElementById('account-status-message');
+
+      // Preencher email ao carregar dados
       try {
         const response = await fetch('/api/users/profile', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -72,6 +97,7 @@
             nomeInput.value = data.user.nome || '';
             bioInput.value = data.user.bio || '';
             privateCheckbox.checked = data.user.is_private || false;
+            emailInput.value = data.user.email || '';
         }
       } catch (error) {
         console.error('Erro ao carregar perfil', error);
@@ -80,6 +106,7 @@
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         statusMsg.textContent = 'Salvando...';
+        statusMsg.style.color = 'var(--color-primary)';
 
         try {
           const res = await fetch('/api/users/profile', {
@@ -98,7 +125,6 @@
           if (res.ok) {
             const data = await res.json();
             statusMsg.textContent = 'Perfil atualizado com sucesso!';
-            // Atualizar localStorage
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             user.nome = data.user.nome;
             localStorage.setItem('user', JSON.stringify(user));
@@ -116,6 +142,43 @@
           statusMsg.style.color = 'red';
         }
       });
+
+      accountForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        accountStatusMsg.textContent = 'Salvando...';
+        accountStatusMsg.style.color = 'var(--color-primary)';
+
+        try {
+          const res = await fetch('/api/users/account', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              email: emailInput.value,
+              senha: senhaInput.value
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            accountStatusMsg.textContent = 'Conta atualizada com sucesso!';
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.email = data.user.email;
+            localStorage.setItem('user', JSON.stringify(user));
+            senhaInput.value = ''; // Limpa o campo de senha
+          } else {
+            const err = await res.json();
+            accountStatusMsg.textContent = `Erro: ${err.message}`;
+            accountStatusMsg.style.color = 'red';
+          }
+        } catch (error) {
+          accountStatusMsg.textContent = `Erro: ${error.message}`;
+          accountStatusMsg.style.color = 'red';
+        }
+      });
+
     });
   </script>
 </body>
