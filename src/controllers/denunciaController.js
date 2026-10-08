@@ -9,9 +9,9 @@ const { validateMediaWithAI } = require('../utils/aiValidator');
 exports.createDenuncia = async (req, res) => {
     try {
         const id_utilizador = req.user.id;
-        const { titulo, descricao, morada, bairro, anonimo, privado, notificacao_pref, midias } = req.body;
+        const { titulo, descricao, categoria, morada, bairro, anonimo, privado, notificacao_pref, midias } = req.body;
 
-        if (!titulo || !descricao || !morada || !bairro) {
+        if (!titulo || !descricao || !categoria || !morada || !bairro) {
             return res.status(400).json({ message: 'Campos obrigatórios faltando.' });
         }
 
@@ -74,6 +74,7 @@ exports.createDenuncia = async (req, res) => {
             id_utilizador,
             titulo: titulo.trim(),
             descricao: descricao.trim(),
+            categoria: categoria.trim(),
             morada: morada.trim(),
             bairro: bairro.trim(),
             anonimo: anonimo || false,
@@ -195,18 +196,19 @@ exports.toggleApoio = async (req, res) => {
 exports.updateOwnDenuncia = async (req, res) => {
     try {
         const id = Number(req.params.id);
-        const { titulo, descricao, morada, bairro } = req.body;
+        const { titulo, descricao, categoria, morada, bairro } = req.body;
 
         if (!Number.isSafeInteger(id) || id < 1) {
             return res.status(400).json({ message: 'Identificador de denúncia inválido.' });
         }
 
-        if (![titulo, descricao, morada, bairro].every(value => typeof value === 'string' && value.trim())) {
-            return res.status(400).json({ message: 'Título, descrição, endereço e bairro são obrigatórios.' });
+        if (![titulo, descricao, categoria, morada, bairro].every(value => typeof value === 'string' && value.trim())) {
+            return res.status(400).json({ message: 'Título, descrição, categoria, endereço e bairro são obrigatórios.' });
         }
 
         const t = titulo.trim();
         const d = descricao.trim();
+        const c = categoria.trim();
         const m = morada.trim();
         const b = bairro.trim();
 
@@ -217,16 +219,17 @@ exports.updateOwnDenuncia = async (req, res) => {
         if (/(.)\1{4,}/.test(t) || /(.)\1{4,}/.test(d)) return res.status(400).json({ message: 'Texto inválido (caracteres repetidos).' });
 
         const badWords = ['puta', 'caralho', 'merda', 'foda', 'foder', 'cuzão', 'cuzao', 'fdp'];
-        const textToCheck = `${t} ${d} ${m} ${b}`.toLowerCase();
+        const textToCheck = `${t} ${d} ${m} ${b} ${c}`.toLowerCase();
         if (badWords.some(word => textToCheck.includes(word))) {
             return res.status(400).json({ message: 'A denúncia contém linguagem imprópria e não pode ser editada dessa forma.' });
         }
 
         const denuncia = await denunciaModel.updateOwnDenuncia(id, req.user.id, {
-            titulo: titulo.trim(),
-            descricao: descricao.trim(),
-            morada: morada.trim(),
-            bairro: bairro.trim()
+            titulo: t,
+            descricao: d,
+            categoria: c,
+            morada: m,
+            bairro: b
         });
 
         if (!denuncia) {
