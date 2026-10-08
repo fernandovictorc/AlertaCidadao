@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apoie o Alerta Cidadão - Doação</title>
+  <link rel="stylesheet" href="assets/css/agnostico.css">
+  <link rel="stylesheet" href="assets/css/projeto.css">
+  <style>
+    .donation-container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      display: flex;
+      overflow: hidden;
+      border: 1px solid var(--color-border, #eaeaea);
+    }
+    .donation-info {
+      flex: 1;
+      background: var(--landing-primary, #22c55e);
+      color: white;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .donation-info h2 {
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: white;
+    }
+    .donation-info p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+    .donation-form-wrapper {
+      flex: 1.2;
+      padding: 40px;
+      background: #fafafa;
+    }
+    .donation-values {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .value-btn {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid var(--color-border, #eaeaea);
+      background: white;
+      border-radius: 8px;
+      font-weight: 700;
+      color: var(--color-text-muted, #4b587c);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      min-width: 80px;
+    }
+    .value-btn.active, .value-btn:hover {
+      border-color: var(--color-primary, #22c55e);
+      color: var(--color-primary, #22c55e);
+      background: #f0fdf4;
+    }
+    .payment-methods {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .method-btn {
+      flex: 1;
+      padding: 15px;
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 8px;
+      font-weight: 600;
+      color: var(--color-text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .method-btn.active {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+    }
+    .pix-checkout {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px dashed var(--color-primary);
+    }
+    .card-checkout {
+      display: block;
+    }
+    .btn-donate {
+      width: 100%;
+      padding: 16px;
+      background: var(--color-primary, #22c55e);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 20px;
+    }
+    .btn-donate:hover {
+      background: #16a34a;
+    }
+    @media (max-width: 768px) {
+      .donation-container {
+        flex-direction: column;
+      }
+      .donation-info {
+        padding: 30px 20px;
+      }
+      .donation-form-wrapper {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--color-text-main); font-weight: 700;">
+        <div style="background: var(--color-primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">A</div>
+        Alerta Cidadão
+      </a>
+      <a href="app.html" class="nav-link" style="color: var(--color-text-muted); text-decoration: none; font-weight: 500;">Voltar ao App</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="donation-container">
+      
+      <!-- Lado Info -->
+      <div class="donation-info">
+        <h2>Faça a diferença hoje</h2>
+        <p>Sua contribuição permite que o <strong>Alerta Cidadão</strong> continue gratuito, sem anúncios, e ajuda a financiar pequenas resoluções urbanas em comunidades carentes.</p>
+        <p>Seja um patrocinador da transparência e da zeladoria urbana colaborativa.</p>
+        <div style="margin-top: 30px; font-size: 14px; opacity: 0.8;">
+          ✓ Transação 100% segura<br>
+          ✓ Cancele a qualquer momento<br>
+          ✓ Prestação de contas pública
+        </div>
+      </div>
+
+      <!-- Lado Checkout -->
+      <div class="donation-form-wrapper">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--color-text-main);">Escolha o valor</h3>
+        
+        <div class="donation-values">
+          <div class="value-btn" data-value="10">R$ 10</div>
+          <div class="value-btn active" data-value="30">R$ 30</div>
+          <div class="value-btn" data-value="50">R$ 50</div>
+          <div class="value-btn" data-value="100">R$ 100</div>
+          <div class="value-btn" data-value="outro" style="flex: 2;">Outro valor</div>
+        </div>
+
+        <div id="custom-value-container" class="form-group" style="display: none;">
+          <label class="form-label">Digite o valor (R$)</label>
+          <input type="number" id="custom-value" class="form-input" placeholder="0,00" min="5">
+        </div>
+
+        <h3 style="margin-bottom: 15px; color: var(--color-text-main); font-size: 16px;">Método de Pagamento</h3>
+        <div class="payment-methods">
+          <button class="method-btn active" data-method="card">💳 Cartão</button>
+          <button class="method-btn" data-method="pix">❖ PIX</button>
+        </div>
+
+        <!-- Formulário Cartão -->
+        <div id="checkout-card" class="card-checkout">
+          <div class="form-group">
+            <label class="form-label">Nome no Cartão</label>
+            <input type="text" class="form-input" placeholder="Como impresso no cartão">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Número do Cartão</label>
+            <input type="text" class="form-input" placeholder="0000 0000 0000 0000">
+          </div>
+          <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Validade</label>
+              <input type="text" class="form-input" placeholder="MM/AA">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-input" placeholder="123">
+            </div>
+          </div>
+        </div>
+
+        <!-- Pix Checkout Mockup -->
+        <div id="checkout-pix" class="pix-checkout">
+          <h4 style="margin-top: 0; color: #059669;">Pague via PIX</h4>
+          <p style="font-size: 13px; color: var(--color-text-muted);">Escaneie o QR Code abaixo com o app do seu banco:</p>
+          <div style="width: 150px; height: 150px; background: #eee; margin: 15px auto; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+            <span style="font-size: 40px; opacity: 0.3;">QR</span>
+          </div>
+          <input type="text" class="form-input" value="00020126360014BR.GOV.BCB.PIX0114+5511999999999..." readonly style="font-size: 11px; text-align: center; color: #666; cursor: copy;">
+          <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="alert('Código Copiado!')">Copiar Código PIX</button>
+        </div>
+
+        <button class="btn-donate" id="btn-finalizar">Doar R$ <span id="btn-value-display">30,00</span></button>
+        <p style="text-align: center; font-size: 12px; color: #888; margin-top: 15px;">🔒 Pagamento processado de forma segura.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentValue = 30;
+      
+      const valueBtns = document.querySelectorAll('.value-btn');
+      const customValueContainer = document.getElementById('custom-value-container');
+      const customValueInput = document.getElementById('custom-value');
+      const btnValueDisplay = document.getElementById('btn-value-display');
+
+      const methodBtns = document.querySelectorAll('.method-btn');
+      const checkoutCard = document.getElementById('checkout-card');
+      const checkoutPix = document.getElementById('checkout-pix');
+      const btnFinalizar = document.getElementById('btn-finalizar');
+
+      // Trocar Valores
+      valueBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          valueBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          if (btn.dataset.value === 'outro') {
+            customValueContainer.style.display = 'block';
+            btnValueDisplay.innerText = customValueInput.value ? parseFloat(customValueInput.value).toFixed(2).replace('.', ',') : '0,00';
+          } else {
+            customValueContainer.style.display = 'none';
+            currentValue = parseInt(btn.dataset.value);
+            btnValueDisplay.innerText = currentValue.toFixed(2).replace('.', ',');
+          }
+        });
+      });
+
+      customValueInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if(!isNaN(val)) {
+          btnValueDisplay.innerText = val.toFixed(2).replace('.', ',');
+        } else {
+          btnValueDisplay.innerText = '0,00';
+        }
+      });
+
+      // Trocar MǸtodo de Pagamento
+      methodBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          methodBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          if (btn.dataset.method === 'pix') {
+            checkoutCard.style.display = 'none';
+            checkoutPix.style.display = 'block';
+            btnFinalizar.style.display = 'none'; // No PIX nǜo precisa botǜo de finalizar, o QR Code jǭ Ǹ o pagamento
+          } else {
+            checkoutCard.style.display = 'block';
+            checkoutPix.style.display = 'none';
+            btnFinalizar.style.display = 'block';
+          }
+        });
+      });
+
+      // Finalizar Pagamento
+      btnFinalizar.addEventListener('click', () => {
+        const btnText = btnFinalizar.innerText;
+        btnFinalizar.innerText = 'Processando...';
+        btnFinalizar.disabled = true;
+        
+        setTimeout(() => {
+          alert('Muito obrigado! Sua doaǜo foi processada com sucesso e ajudarǭ a manter o Alerta Cidadǜo funcionando.');
+          btnFinalizar.innerText = 'Sucesso! 🎉';
+          btnFinalizar.style.background = '#059669';
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 2000);
+        }, 1500);
+      });
+    });
+  </script>
+</body>
+</html>
+
