@@ -1,111 +1,188 @@
-const nodemailer = require('nodemailer');
+const userModel = require('../models/userModel');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const emailService = require('../utils/emailService');
 
-// Configuração do transporter reutilizável usando Gmail
-// O usuário precisará fornecer o e-mail do Gmail e uma Senha de App nas variáveis de ambiente.
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Usa os padrões do Gmail
-    auth: {
-        user: process.env.EMAIL_USER, // Ex: seuemail@gmail.com
-        pass: process.env.EMAIL_PASS  // Senha de App gerada no Google
-    }
-});
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_default';
 
-/**
- * Envia um e-mail genérico
- */
-exports.sendEmail = async (to, subject, text, html) => {
+exports.registerUser = async (req, res) => {
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.warn('⚠️ EMAIL_USER ou EMAIL_PASS não configurados no .env. E-mail simulado no console:', subject);
-            return { messageId: 'simulated-id' };
+        const { nome, email, senha, data_nascimento } = req.body;
+
+        if (!nome || !email || !senha || !data_nascimento) {
+            return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
         }
 
-        const mailOptions = {
-            from: `"Alerta Cidadão" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            text,
-            html
-        };
+        const nascimento = new Date(data_nascimento);
+        const hoje = new Date();
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const m = hoje.getMonth() - nascimento.getMonth();
+        if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
+        if (idade < 16) {
+            return res.status(400).json({ message: 'Você precisa ter pelo menos 16 anos para criar uma conta no Alerta Cidadão.' });
+        }
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('E-mail enviado: %s', info.messageId);
-        return info;
+        const existingUser = await userModel.findUserByEmail(email);
+        if (existingUser) {
+            return res.status(409).json({ message: 'E-mail já está em uso.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(senha, salt);
+
+        const newUser = await userModel.createUser({
+            nome,
+            email,
+            senha: hashedPassword,
+            data_nascimento,
+            imagem_perfil: req.body.imagem_perfil || null
+        });
+
+        // Tentar enviar e-mail de boas-vindas assincronamente (sem await para não travar a tela)
+        emailService.sendWelcomeEmail(email, nome).catch(emailError => {
+            console.error('Erro ao enviar e-mail de boas-vindas:', emailError);
+        });
+
+        res.status(201).json({ message: 'Usuário registrado com sucesso!', user: newUser });
     } catch (error) {
-        console.error('Erro ao enviar e-mail:', error);
-        throw error;
+        console.error('Erro no registro:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
 
-/**
- * E-mail de Boas-vindas (Cadastro)
- */
-exports.sendWelcomeEmail = async (to, nome) => {
-    const subject = 'Bem-vindo ao Alerta Cidadão!';
-    const html = `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-            <h2>Olá, ${nome}!</h2>
-            <p>Seja muito bem-vindo ao <strong>Alerta Cidadão</strong>.</p>
-            <p>O seu cadastro foi realizado com sucesso. A partir de agora, você pode relatar problemas da sua comunidade e ajudar a construir uma cidade melhor!</p>
-            <br>
-            <p>Atenciosamente,<br><strong>Equipe Alerta Cidadão</strong></p>
-        </div>
-    `;
-    const text = `Olá, ${nome}! Seja muito bem-vindo ao Alerta Cidadão. O seu cadastro foi realizado com sucesso.`;
-    
-    return this.sendEmail(to, subject, text, html);
-};
+exports.loginUser = async (req, res) => {
+    try {
+        const { email, senha } = req.body;
 
-/**
- * E-mail de Confirmação de Denúncia (Criação)
- */
-exports.sendDenunciaCreatedEmail = async (to, nome, tituloDenuncia) => {
-    const subject = 'Denúncia Recebida - Alerta Cidadão';
-    const html = `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-            <h2>Olá, ${nome}!</h2>
-            <p>Recebemos a sua denúncia: <strong>"${tituloDenuncia}"</strong>.</p>
-            <p>Ela já foi registrada no nosso sistema. Os órgãos públicos ou privados competentes serão notificados e, em breve, poderão responder ou atualizar o andamento do caso.</p>
-            <p>Você receberá um novo e-mail sempre que houver uma atualização de status.</p>
-            <br>
-            <p>Atenciosamente,<br><strong>Equipe Alerta Cidadão</strong></p>
-        </div>
-    `;
-    const text = `Olá, ${nome}! Recebemos a sua denúncia: "${tituloDenuncia}". Ela já foi registrada e os órgãos públicos/privados poderão responder em breve.`;
-    
-    return this.sendEmail(to, subject, text, html);
-};
+        if (!email || !senha) {
+            return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+        }
 
-/**
- * E-mail de Atualização de Status da Denúncia
- */
-exports.sendDenunciaStatusEmail = async (to, nome, tituloDenuncia, novoEstado, respostaOrgao) => {
-    const subject = 'Atualização de Denúncia - Alerta Cidadão';
-    let respostaHtml = '';
-    let respostaText = '';
+        const user = await userModel.findUserByEmail(email);
+        if (!user) {
+            return res.status(401).json({ message: 'Credenciais inválidas.' });
+        }
 
-    if (respostaOrgao) {
-        respostaHtml = `
-            <div style="background-color: #f4f4f4; padding: 15px; border-left: 4px solid #4CAF50; margin-top: 15px;">
-                <strong>Resposta do Órgão:</strong><br>
-                ${respostaOrgao}
-            </div>
-        `;
-        respostaText = `\nResposta do Órgão: ${respostaOrgao}\n`;
+        const isMatch = await bcrypt.compare(senha, user.senha);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Credenciais inválidas.' });
+        }
+
+        const token = jwt.sign({ id: user.id, perfil: user.perfil }, JWT_SECRET, { expiresIn: '1d' });
+
+        res.json({
+            message: 'Login bem-sucedido.',
+            token,
+            user: {
+                id: user.id,
+                nome: user.nome,
+                email: user.email,
+                imagem_perfil: user.imagem_perfil,
+                perfil: user.perfil,
+                primeiro_acesso: user.primeiro_acesso
+            }
+        });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
     }
-
-    const html = `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-            <h2>Olá, ${nome}!</h2>
-            <p>Houve uma atualização na sua denúncia: <strong>"${tituloDenuncia}"</strong>.</p>
-            <p>O novo status é: <strong style="color: #2196F3;">${novoEstado.toUpperCase()}</strong></p>
-            ${respostaHtml}
-            <br>
-            <p>Atenciosamente,<br><strong>Equipe Alerta Cidadão</strong></p>
-        </div>
-    `;
-    const text = `Olá, ${nome}! A sua denúncia "${tituloDenuncia}" teve o status atualizado para: ${novoEstado.toUpperCase()}.${respostaText}`;
-    
-    return this.sendEmail(to, subject, text, html);
 };
 
+exports.disablePrimeiroAcesso = async (req, res) => {
+    try {
+        await userModel.disablePrimeiroAcesso(req.user.id);
+        res.json({ message: 'Primeiro acesso desativado com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao desativar primeiro acesso:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.getUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await userModel.findUserById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+        res.json({ user });
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { nome, imagem_perfil, bio, is_private } = req.body;
+
+        const updatedUser = await userModel.updateUserProfile(userId, { nome, imagem_perfil, bio, is_private });
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.json({ message: 'Perfil atualizado com sucesso.', user: updatedUser });
+    } catch (error) {
+        console.error('Erro ao atualizar perfil:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.getUserById = async (req, res) => {
+    try {
+        const idParam = req.params.id;
+        const targetUser = await userModel.findUserById(idParam);
+        
+        if (!targetUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+        
+        const isSelf = req.user ? req.user.id == idParam : false;
+        const isAdmin = req.user ? (req.user.role === 'admin' || req.user.perfil === 'admin') : false;
+        
+        if (targetUser.is_private && !isSelf && !isAdmin) {
+            return res.status(403).json({ erro: 'Perfil Privado' });
+        }
+        
+        // Fetch denuncias for this user
+        const denunciaModel = require('../models/denunciaModel');
+        const denuncias = await denunciaModel.getDenunciasByUser(idParam);
+        
+        res.json({ user: targetUser, denuncias });
+    } catch (error) {
+        console.error('Erro ao buscar usuário por id:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.updateAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { email, senha } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ message: 'E-mail é obrigatório.' });
+        }
+
+        let senhaHash = null;
+        if (senha && senha.trim() !== '') {
+            senhaHash = await bcrypt.hash(senha, 10);
+        }
+
+        const updatedUser = await userModel.updateUserAccount(userId, email, senhaHash);
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.json({ message: 'Conta atualizada com sucesso.', user: updatedUser });
+    } catch (error) {
+        if (error.code === '23505') { // UNIQUE constraint violation in PostgreSQL
+            return res.status(400).json({ message: 'Este e-mail já está em uso.' });
+        }
+        console.error('Erro ao atualizar conta:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
