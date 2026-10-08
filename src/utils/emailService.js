@@ -15,6 +15,11 @@ const transporter = nodemailer.createTransport({
  */
 exports.sendEmail = async (to, subject, text, html) => {
     try {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.warn('⚠️ EMAIL_USER ou EMAIL_PASS não configurados no .env. E-mail simulado no console:', subject);
+            return { messageId: 'simulated-id' };
+        }
+
         const mailOptions = {
             from: `"Alerta Cidadão" <${process.env.EMAIL_USER}>`,
             to,
