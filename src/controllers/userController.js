@@ -13,6 +13,17 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
         }
 
+        const nascimento = new Date(data_nascimento);
+        const hoje = new Date();
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const m = hoje.getMonth() - nascimento.getMonth();
+        if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
+        if (idade < 16) {
+            return res.status(400).json({ message: 'Você precisa ter pelo menos 16 anos para criar uma conta no Alerta Cidadão.' });
+        }
+
         const existingUser = await userModel.findUserByEmail(email);
         if (existingUser) {
             return res.status(409).json({ message: 'E-mail já está em uso.' });
@@ -72,11 +83,22 @@ exports.loginUser = async (req, res) => {
                 nome: user.nome,
                 email: user.email,
                 imagem_perfil: user.imagem_perfil,
-                perfil: user.perfil
+                perfil: user.perfil,
+                primeiro_acesso: user.primeiro_acesso
             }
         });
     } catch (error) {
         console.error('Erro no login:', error);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+exports.disablePrimeiroAcesso = async (req, res) => {
+    try {
+        await userModel.disablePrimeiroAcesso(req.user.id);
+        res.json({ message: 'Primeiro acesso desativado com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao desativar primeiro acesso:', error);
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
