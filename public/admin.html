@@ -7,15 +7,123 @@
   <link rel="stylesheet" href="assets/css/agnostico.css">
   <link rel="stylesheet" href="assets/css/projeto.css">
   <style>
-    .admin-select {
-      padding: 0.5rem;
-      border-radius: var(--radius--md);
-      border: 1px solid var(--color--border);
-      background-color: var(--color--bg--elevated);
-      font-family: inherit;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
+    body {
+      background-color: #f1f5f9;
+    }
+    .admin-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--color-border, #eaeaea);
+      margin-bottom: 2rem;
+    }
+    .admin-tab {
+      padding: 1rem 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-muted, #64748b);
       cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .admin-tab.active {
+      color: var(--color-primary, #22c55e);
+      border-bottom-color: var(--color-primary, #22c55e);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Dashboard Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      border: 1px solid var(--color-border, #eaeaea);
+    }
+    .stat-card h4 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--color-text-muted, #64748b);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--color-text-main, #1e293b);
+      margin: 0.5rem 0 0;
+    }
+    /* Fake Heatmap */
+    .heatmap-mock {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid var(--color-border, #eaeaea);
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-image: radial-gradient(circle at 30% 40%, rgba(239, 68, 68, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 60%, rgba(234, 179, 8, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 40% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 40%);
+    }
+    /* Table */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+    .admin-table th, .admin-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border, #eaeaea);
+    }
+    .admin-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--color-text-muted, #64748b);
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-select, .btn-small {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      border: 1px solid var(--color-border, #eaeaea);
+      background: white;
+      cursor: pointer;
+    }
+    .btn-small.danger {
+      color: white;
+      background: #ef4444;
+      border-color: #ef4444;
     }
   </style>
 </head>
@@ -24,104 +132,220 @@
     <div class="container header-content">
       <a href="index.html" class="logo">
         <div class="logo-icon">A</div>
-        Alerta Cidadão
+        Alerta Cidadão (Admin)
       </a>
       <nav class="nav-links">
-        <a href="index.html" class="nav-link">Início</a>
-        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="index.html" class="nav-link">Sair do Painel</a>
       </nav>
     </div>
   </header>
 
-  <main class="container">
-    <h2>Painel Administrativo</h2>
-    <p>Gerencie todas as denúncias da plataforma.</p>
-    <div class="feed-container d--flex flex--dir--column gap--md" style="margin-top: 2rem;">
-      <p>Carregando denúncias...</p>
+  <main class="admin-container">
+    <div class="admin-header">
+      <h2>Painel B2G / B2B - Visão Geral</h2>
+      <span class="tag" style="background: var(--color-primary); color: white;">Licença: Prefeitura Ativa</span>
     </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('dashboard')">Dashboard Analítico</button>
+      <button class="admin-tab" onclick="switchTab('financeiro')">Gestão Financeira</button>
+      <button class="admin-tab" onclick="switchTab('moderacao')">Moderação</button>
+    </div>
+
+    <!-- TAB: DASHBOARD ANALÍTICO -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <h4>Vazamentos de Água</h4>
+          <p class="value" id="stat-agua">12</p>
+        </div>
+        <div class="stat-card">
+          <h4>Focos de Lixo</h4>
+          <p class="value" id="stat-lixo">28</p>
+        </div>
+        <div class="stat-card">
+          <h4>Problemas de Mobilidade</h4>
+          <p class="value" id="stat-mobilidade">15</p>
+        </div>
+        <div class="stat-card">
+          <h4>Economia Estimada</h4>
+          <p class="value" style="color: var(--color-primary);">R$ 145k</p>
+        </div>
+      </div>
+      
+      <div class="heatmap-mock">
+        <h3 style="margin-bottom: 10px;">Mapa de Calor (Inteligência Geográfica)</h3>
+        <p style="color: var(--color-text-muted); max-width: 500px;">
+          Esta visualização interativa é o núcleo do produto vendido para prefeituras e concessionárias, indicando as zonas de maior desperdício de recursos (Água, Energia e Lixo).
+        </p>
+        <div style="padding: 10px 20px; background: white; border: 1px solid #ccc; border-radius: 20px; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">🗺️ Mapa Interativo Bloqueado na Versão Demo</div>
+      </div>
+    </div>
+
+    <!-- TAB: FINANCEIRO (CROWDFUNDING) -->
+    <div id="tab-financeiro" class="tab-content">
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <h4>Total Arrecadado</h4>
+          <p class="value" style="color: var(--color-primary);">R$ 4.520,00</p>
+        </div>
+        <div class="stat-card">
+          <h4>Taxa Retida (5%)</h4>
+          <p class="value">R$ 226,00</p>
+        </div>
+        <div class="stat-card">
+          <h4>Campanhas Ativas</h4>
+          <p class="value">8</p>
+        </div>
+      </div>
+
+      <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid var(--color-border, #eaeaea);">
+        <h3>Campanhas de Crowdfunding em Andamento</h3>
+        <table class="admin-table" style="margin-top: 15px;">
+          <thead>
+            <tr>
+              <th>Causa (Denúncia)</th>
+              <th>Categoria</th>
+              <th>Meta</th>
+              <th>Arrecadado</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Limpeza do entulho na Praça Central</td>
+              <td><span class="tag">Lixo</span></td>
+              <td>R$ 800,00</td>
+              <td><strong>R$ 800,00 (100%)</strong></td>
+              <td><button class="btn-small" style="background: var(--color-primary); color: white;">Liberar Fundo</button></td>
+            </tr>
+            <tr>
+              <td>Caçamba para entulhos na Rua XV</td>
+              <td><span class="tag">Lixo</span></td>
+              <td>R$ 400,00</td>
+              <td>R$ 150,00 (37%)</td>
+              <td><button class="btn-small">Pausar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: MODERAÇÃO -->
+    <div id="tab-moderacao" class="tab-content">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Categoria</th>
+            <th>Usuário</th>
+            <th>Status Oficial</th>
+            <th>Moderação</th>
+          </tr>
+        </thead>
+        <tbody id="admin-table-body">
+          <tr><td colspan="6" style="text-align: center;">Carregando denúncias...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </main>
 
   <script src="js/auth.js"></script>
-  <script src="js/ui.js"></script>
   <script type="module">
-    import { getAllDenunciasAdmin, updateDenunciaStatus } from './js/api.js';
+    import { getAllDenunciasAdmin, updateDenunciaStatus, deleteDenuncia } from './js/api.js';
 
-    // Proteção de rota do lado do cliente (simples)
+    // Tabs logic
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    };
+
     const user = getUser();
-    if (!user || user.perfil !== 'admin') {
-      alert("Acesso restrito a administradores.");
+    if (!user || (user.perfil !== 'admin' && user.role !== 'admin')) {
+      alert("Acesso restrito a administradores. Redirecionando...");
       window.location.href = 'index.html';
     }
 
-    // Função para alterar estado
-    window.changeStatus = async function(id, selectElement) {
-      const newStatus = selectElement.value;
+    // Carregar denúncias reais na aba de Moderação
+    async function loadAdminData() {
       try {
-        await updateDenunciaStatus(id, { estado: newStatus });
-        alert('Estado atualizado com sucesso!');
+        const { denuncias } = await getAllDenunciasAdmin();
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '';
+
+        if (!denuncias || denuncias.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma denúncia encontrada no sistema.</td></tr>';
+          return;
+        }
+
+        // Estatísticas para o Dashboard
+        let agua = 0, lixo = 0, mobilidade = 0;
+
+        denuncias.forEach(d => {
+          // Contagem
+          if (d.categoria === 'Água') agua++;
+          if (d.categoria === 'Lixo') lixo++;
+          if (d.categoria === 'Mobilidade') mobilidade++;
+
+          // Tabela
+          const tr = document.createElement('tr');
+          const statusOptions = ['Pendente', 'Em Andamento', 'Concluído'];
+          let selectHtml = `<select class="admin-select" onchange="changeStatus(${d.id}, this)">`;
+          statusOptions.forEach(s => {
+            selectHtml += `<option value="${s}" ${d.estado === s || d.status === s ? 'selected' : ''}>${s}</option>`;
+          });
+          selectHtml += `</select>`;
+
+          tr.innerHTML = `
+            <td>#${d.id}</td>
+            <td><strong>${d.titulo}</strong><br><span style="font-size:0.8rem;color:#888;">${d.bairro}</span></td>
+            <td><span class="tag">${d.categoria || 'Outros'}</span></td>
+            <td>${d.nome_autor}</td>
+            <td>${selectHtml}</td>
+            <td>
+              <button class="btn-small danger" onclick="deleteFake(${d.id})">Apagar (Fake)</button>
+              <button class="btn-small" onclick="alert('Funcionalidade de Banimento em desenvolvimento')">Banir Usuário</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('stat-agua').textContent = agua;
+        document.getElementById('stat-lixo').textContent = lixo;
+        document.getElementById('stat-mobilidade').textContent = mobilidade;
+
       } catch (err) {
-        alert('Erro ao atualizar estado: ' + err.message);
-        // Retorna ao valor anterior ou recarrega (simplificado: recarrega a página)
-        window.location.reload();
+        console.error(err);
+        document.getElementById('admin-table-body').innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados: ${err.message}</td></tr>`;
+      }
+    }
+
+    window.changeStatus = async function(id, selectElement) {
+      try {
+        await updateDenunciaStatus(id, { status: selectElement.value });
+        alert('Status atualizado! Isso notificará a prefeitura/usuário.');
+      } catch (err) {
+        alert('Erro ao atualizar: ' + err.message);
       }
     };
 
-    function renderAdminFeed(denuncias, container) {
-      container.innerHTML = '';
-      
-      if (denuncias.length === 0) {
-          container.innerHTML = '<p>Nenhuma denúncia encontrada.</p>';
-          return;
+    window.deleteFake = async function(id) {
+      if(confirm('Atenção: Tem certeza que deseja apagar essa denúncia por ser Fake ou ofensiva?')) {
+        try {
+          await deleteDenuncia(id);
+          alert('Denúncia removida do sistema com sucesso.');
+          loadAdminData();
+        } catch (err) {
+          alert('Erro ao apagar denúncia. Apenas o dono ou um super-admin configurado na API pode deletar (verifique permissões).');
+        }
       }
+    };
 
-      const estados = ['Não Respondido', 'Em Análise', 'Resolvido'];
-
-      denuncias.forEach(denuncia => {
-          const article = document.createElement('article');
-          article.className = 'product-card';
-          
-          const imageUrl = (denuncia.midias && denuncia.midias.length > 0) ? denuncia.midias[0].url_ou_base64 : 'assets/images/default.jpg';
-          
-          let optionsHtml = '';
-          estados.forEach(estado => {
-            const selected = (denuncia.estado === estado) ? 'selected' : '';
-            optionsHtml += `<option value="${estado}" ${selected}>${estado}</option>`;
-          });
-
-          article.innerHTML = `
-              <img src="${imageUrl}" alt="Imagem da denúncia" class="product-card-thumbnail" style="object-fit: cover;">
-              <div class="product-card-content">
-                  <a href="denuncia-detalhes.html?id=${denuncia.id}" style="color: inherit; text-decoration: none;">
-                      <h3>${denuncia.titulo} ${denuncia.privado ? '(Privado)' : ''}</h3>
-                  </a>
-                  <p>${denuncia.descricao}</p>
-                  <div class="meta-info" style="align-items: center;">
-                    <span class="tag">${denuncia.bairro}</span>
-                    <div class="comment-count">
-                      Por: ${denuncia.nome_autor}
-                    </div>
-                    <select class="admin-select" onchange="changeStatus(${denuncia.id}, this)">
-                      ${optionsHtml}
-                    </select>
-                  </div>
-              </div>
-          `;
-          
-          container.appendChild(article);
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      updateHeaderAuthUI();
-      
-      const feedContainer = document.querySelector('.feed-container');
-      try {
-        const response = await getAllDenunciasAdmin();
-        renderAdminFeed(response.denuncias, feedContainer);
-      } catch (err) {
-        feedContainer.innerHTML = '<p>Erro ao carregar denúncias. Verifique se possui permissão.</p>';
-      }
-    });
+    document.addEventListener('DOMContentLoaded', loadAdminData);
   </script>
 </body>
 </html>
