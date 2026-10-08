@@ -93,12 +93,26 @@
         } else {
             // Meu Perfil
             titleEl.textContent = 'Minhas denúncias';
-            greetingEl.textContent = user ? `Olá, ${user.nome}. Aqui você pode acompanhar, editar ou excluir suas denúncias.` : '';
+            greetingEl.innerHTML = user ? `Olá, <strong>${user.nome}</strong>. Aqui você pode acompanhar suas denúncias.` : '';
+            
+            try {
+                const response = await fetch('/api/users/profile', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.user.bio) {
+                        greetingEl.innerHTML += `<br><br><em style="color: var(--color-text-muted);">"${data.user.bio}"</em>`;
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
             
             const editProfileBtn = document.createElement('a');
             editProfileBtn.href = 'editar-perfil.html';
             editProfileBtn.className = 'btn-secondary';
-            editProfileBtn.textContent = 'Editar Perfil';
+            editProfileBtn.textContent = 'Editar Perfil / Conta';
             editProfileBtn.style.marginLeft = '10px';
             sectionTitle.appendChild(editProfileBtn);
             
