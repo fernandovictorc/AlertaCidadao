@@ -45,6 +45,18 @@
           <textarea id="descricao" name="descricao" class="form-textarea" placeholder="Descreva o problema com o máximo de detalhes..." required></textarea>
         </div>
 
+        <div class="form-group">
+          <label for="categoria" class="form-label">Categoria do Problema</label>
+          <select id="categoria" name="categoria" class="form-input" required>
+            <option value="" disabled selected>Selecione uma categoria sustentável</option>
+            <option value="Água">Água (Vazamentos, desperdício)</option>
+            <option value="Energia">Energia (Postes, luz acesa dia, fios caídos)</option>
+            <option value="Lixo">Lixo (Descarte irregular, coleta)</option>
+            <option value="Mobilidade">Mobilidade (Buracos, calçadas quebradas)</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+
         <div class="d--flex flex--wrap--wrap gap--md">
           <div class="form-group flex--1">
             <label for="endereco" class="form-label">Endereço</label>
@@ -127,6 +139,7 @@
 
         document.getElementById('titulo').value = denuncia.titulo;
         document.getElementById('descricao').value = denuncia.descricao;
+        if (denuncia.categoria) document.getElementById('categoria').value = denuncia.categoria;
         document.getElementById('endereco').value = denuncia.morada;
         document.getElementById('bairro').value = denuncia.bairro;
         submitButton.disabled = false;
@@ -217,6 +230,7 @@
       const dados = {
         titulo: t,
         descricao: d,
+        categoria: document.getElementById('categoria').value,
         morada: document.getElementById('endereco').value.trim(),
         bairro: document.getElementById('bairro').value.trim()
       };
