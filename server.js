@@ -20,7 +20,26 @@ const denunciaRoutes = require('./src/routes/denunciaRoutes');
 // Servir arquivos estáticos do frontend (Atenção: Os ficheiros estáticos devem ser movidos para a pasta public/)
 app.use(express.static('public'));
 
+const userModel = require('./src/models/userModel');
+const denunciaModel = require('./src/models/denunciaModel');
+const apoioModel = require('./src/models/apoioModel');
+
 // Inicialização (Harness)
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await userModel.createTable();
+        await denunciaModel.createTable();
+        if (apoioModel && apoioModel.createTable) {
+            await apoioModel.createTable();
+        }
+        console.log('Tabelas da base de dados verificadas/criadas com sucesso.');
+    } catch (error) {
+        console.error('Erro ao inicializar tabelas:', error);
+    }
+
+    app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
+    });
+};
+
+startServer();
