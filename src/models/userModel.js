@@ -71,11 +71,26 @@ const disablePrimeiroAcesso = async (id) => {
     return result.rows[0];
 };
 
+const updateUserAccount = async (id, email, senhaHash) => {
+    // Atualiza email, e se a senhaHash for fornecida, atualiza a senha também.
+    let query, values;
+    if (senhaHash) {
+        query = `UPDATE utilizadores SET email = $1, senha = $2 WHERE id = $3 RETURNING id, nome, email;`;
+        values = [email, senhaHash, id];
+    } else {
+        query = `UPDATE utilizadores SET email = $1 WHERE id = $2 RETURNING id, nome, email;`;
+        values = [email, id];
+    }
+    const result = await db.query(query, values);
+    return result.rows[0];
+};
+
 module.exports = {
     createTable,
     createUser,
     findUserByEmail,
     findUserById,
     updateUserProfile,
-    disablePrimeiroAcesso
+    disablePrimeiroAcesso,
+    updateUserAccount
 };
