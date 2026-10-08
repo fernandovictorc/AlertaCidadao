@@ -63,6 +63,7 @@ export const registerUser = (dados) => fetchAPI('/users/register', 'POST', dados
 export const loginUser = (dados) => fetchAPI('/users/login', 'POST', dados);
 export const getUserProfile = () => fetchAPI('/users/profile');
 export const updateUserProfile = (dados) => fetchAPI('/users/profile', 'PUT', dados);
+export const disablePrimeiroAcesso = () => fetchAPI('/users/primeiro-acesso', 'PATCH');
 
 export const getDenuncias = () => fetchAPI('/denuncias');
 export const getMyDenuncias = () => fetchAPI('/denuncias/minhas');
