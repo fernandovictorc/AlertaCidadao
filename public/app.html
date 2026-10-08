@@ -18,11 +18,21 @@
       </a>
       <nav class="nav-links">
         <a href="index.html" class="nav-link">Início</a>
-        <a href="nova-denuncia.html" class="nav-link">Nova Denúncia</a>
+        <a href="nova-denuncia.html" id="btn-nova-denuncia" class="nav-link">Nova Denúncia</a>
         <a href="login.html" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">Entrar</a>
       </nav>
     </div>
   </header>
+
+  <!-- Onboarding Overlay (Fase 2) -->
+  <div id="onboarding-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 1000;">
+    <div style="position: absolute; top: 70px; right: 150px; background: white; padding: 20px; border-radius: 8px; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+      <h3 style="margin-top: 0; color: var(--color-primary, #22c55e);">Bem-vindo!</h3>
+      <p style="margin-bottom: 0; color: #333;">Comece fazendo sua primeira denúncia clicando aqui.</p>
+      <!-- Uma setinha apontando para o botão -->
+      <div style="position: absolute; top: -10px; right: 20px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid white;"></div>
+    </div>
+  </div>
 
   <!-- Conteúdo Principal -->
   <main class="container app-layout">
@@ -46,5 +56,41 @@
   </script>
   <script src="js/ui.js?v=2"></script>
   <script type="module" src="js/feed.js?v=3"></script>
+  
+  <script type="module">
+    import { disablePrimeiroAcesso } from './js/api.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = getUser(); // Função global do auth.js
+      if (user && user.primeiro_acesso) {
+        const overlay = document.getElementById('onboarding-overlay');
+        const btnNovaDenuncia = document.getElementById('btn-nova-denuncia');
+        
+        if (overlay && btnNovaDenuncia) {
+          overlay.style.display = 'block';
+          // Traz o botão para cima do overlay temporariamente
+          btnNovaDenuncia.style.position = 'relative';
+          btnNovaDenuncia.style.zIndex = '1001';
+          btnNovaDenuncia.style.background = 'var(--color-primary, #22c55e)';
+          btnNovaDenuncia.style.color = 'white';
+          btnNovaDenuncia.style.padding = '8px 12px';
+          btnNovaDenuncia.style.borderRadius = '4px';
+
+          btnNovaDenuncia.addEventListener('click', async (e) => {
+            // Se o usuário clicar, primeiro desativamos o flag no banco
+            try {
+              await disablePrimeiroAcesso();
+              // Atualizamos no localStorage para não mostrar de novo caso ele volte
+              user.primeiro_acesso = false;
+              localStorage.setItem('user', JSON.stringify(user));
+            } catch (err) {
+              console.error('Falha ao desativar primeiro acesso', err);
+            }
+            // A navegação padrão ocorrerá, levando o usuário para a página de nova denúncia
+          });
+        }
+      }
+    });
+  </script>
 </body>
 </html>
