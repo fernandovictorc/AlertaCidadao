@@ -43,3 +43,20 @@ function getUser() {
 
 // Exemplos de eventos a serem acionados pelo login.html futuramente:
 // async function handleLogin(email, senha) { ... guarda token e user ... }
+
+/**
+ * Valida se a data de nascimento fornecida corresponde a uma pessoa de pelo menos 16 anos.
+ * @param {string} dateString (formato YYYY-MM-DD)
+ * @returns {boolean}
+ */
+function isAtLeast16YearsOld(dateString) {
+    if (!dateString) return false;
+    const nascimento = new Date(dateString);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+        idade--;
+    }
+    return idade >= 16;
+}
